@@ -1,6 +1,6 @@
 import {
-  Drop, Snowflake, FaucetSimple, Warning, Lightning,
-  Waves, UsersThree, Plant, Tree, ArrowsClockwise, Layers,
+  Drop, Snowflake, Faucet, Warning, Lightning,
+  Waves, UsersThree, Plant, Tree, ArrowsClockwise, StackSimple,
 } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { useLayers, LayerKey } from "./LayerContext";
@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 const items: { key: LayerKey; label: string; Icon: typeof Drop; color: string }[] = [
   { key: "rivers", label: "Rivers & Streams", Icon: Waves, color: "text-river" },
   { key: "glaciers", label: "Glaciers", Icon: Snowflake, color: "text-glacier" },
-  { key: "water", label: "Clean Water Access", Icon: FaucetSimple, color: "text-info" },
+  { key: "water", label: "Clean Water Access", Icon: Faucet, color: "text-info" },
   { key: "risk", label: "Climate Risk Zones", Icon: Warning, color: "text-destructive" },
   { key: "hydro", label: "Hydropower", Icon: Lightning, color: "text-hydro" },
   { key: "reservoirs", label: "Reservoirs", Icon: Drop, color: "text-primary" },
@@ -26,7 +26,7 @@ export function LeftSidebar() {
     <aside className="panel flex flex-col w-full h-full overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
         <div className="flex items-center gap-2">
-          <Layers size={17} weight="duotone" className="text-primary" />
+          <StackSimple size={17} weight="duotone" className="text-primary" />
           <h2 className="font-semibold text-[14px] text-foreground">Map Layers</h2>
         </div>
         <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-soft text-primary">
