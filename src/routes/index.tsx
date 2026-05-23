@@ -1,26 +1,37 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AppShell } from "@/components/layout/AppShell";
+import { MapView } from "@/components/map/MapView";
+import { MapLegend } from "@/components/map/MapLegend";
+import { BasemapSwitcher } from "@/components/map/BasemapSwitcher";
+import { StatsCards } from "@/components/stats/StatsCards";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "AquaMap TJ — Water Intelligence · Tajikistan" },
+      { name: "description", content: "Interactive environmental intelligence platform for water resources, glaciers, hydropower and climate risks in Tajikistan." },
+      { property: "og:title", content: "AquaMap TJ — Water Intelligence · Tajikistan" },
+      { property: "og:description", content: "Interactive environmental intelligence platform for Tajikistan." },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
 function Index() {
-  return <PlaceholderIndex />;
+  return (
+    <AppShell>
+      <div className="flex-1 flex flex-col gap-3 min-h-0">
+        <div className="relative flex-1 min-h-[420px] rounded-2xl overflow-hidden panel">
+          <MapView />
+          <div className="absolute top-3 left-3 z-[400]">
+            <BasemapSwitcher />
+          </div>
+          <div className="absolute bottom-3 left-3 z-[400]">
+            <MapLegend />
+          </div>
+        </div>
+        <StatsCards />
+      </div>
+    </AppShell>
+  );
 }
