@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Drop, ShareNetwork, Lightning, UploadSimple, Globe, CaretDown, Check, DotsThreeVertical } from "@phosphor-icons/react";
+import { Drop, ShareNetwork, Lightning, UploadSimple, Globe, CaretDown, Check } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -103,11 +103,6 @@ export function TopNav() {
           <Globe size={15} />
           <span className="font-semibold text-[12px]">{currentLang.abbr}</span>
           <CaretDown size={11} weight="bold" className={`transition-transform ${langOpen ? "rotate-180" : ""}`} />
-        </button>
-
-        <button className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg border border-border bg-card text-foreground hover:bg-secondary transition"
-          onClick={() => { setMoreOpen((o) => !o); setLangOpen(false); }} ref={!moreBtnRef.current ? moreBtnRef : undefined}>
-          <DotsThreeVertical size={16} weight="bold" />
         </button>
 
         <button className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-sm font-medium hover:bg-secondary transition">
