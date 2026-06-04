@@ -1,14 +1,15 @@
 import { Sun, Mountains, GlobeHemisphereEast } from "@phosphor-icons/react";
 import { useLayers } from "../layout/LayerContext";
-
-const opts = [
-  { id: "light" as const, label: "Light", Icon: Sun },
-  { id: "terrain" as const, label: "Terrain", Icon: Mountains },
-  { id: "satellite" as const, label: "Satellite", Icon: GlobeHemisphereEast },
-];
+import { useI18n } from "@/lib/i18n";
 
 export function BasemapSwitcher() {
   const { basemap, setBasemap } = useLayers();
+  const { t } = useI18n();
+  const opts = [
+    { id: "light" as const, label: t("basemap.light"), Icon: Sun },
+    { id: "terrain" as const, label: t("basemap.terrain"), Icon: Mountains },
+    { id: "satellite" as const, label: t("basemap.satellite"), Icon: GlobeHemisphereEast },
+  ];
   return (
     <div className="panel flex p-1 gap-0.5 bg-card/95 backdrop-blur-md">
       {opts.map((o) => {
