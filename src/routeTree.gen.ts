@@ -9,12 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SourcesRouteImport } from './routes/sources'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
+const SourcesRoute = SourcesRouteImport.update({
+  id: '/sources',
+  path: '/sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -46,6 +58,8 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/learn': typeof LearnRoute
   '/reports': typeof ReportsRoute
+  '/roadmap': typeof RoadmapRoute
+  '/sources': typeof SourcesRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +67,8 @@ export interface FileRoutesByTo {
   '/analytics': typeof AnalyticsRoute
   '/learn': typeof LearnRoute
   '/reports': typeof ReportsRoute
+  '/roadmap': typeof RoadmapRoute
+  '/sources': typeof SourcesRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesById {
@@ -61,14 +77,38 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/learn': typeof LearnRoute
   '/reports': typeof ReportsRoute
+  '/roadmap': typeof RoadmapRoute
+  '/sources': typeof SourcesRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analytics' | '/learn' | '/reports' | '/api/chat'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/learn'
+    | '/reports'
+    | '/roadmap'
+    | '/sources'
+    | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analytics' | '/learn' | '/reports' | '/api/chat'
-  id: '__root__' | '/' | '/analytics' | '/learn' | '/reports' | '/api/chat'
+  to:
+    | '/'
+    | '/analytics'
+    | '/learn'
+    | '/reports'
+    | '/roadmap'
+    | '/sources'
+    | '/api/chat'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/learn'
+    | '/reports'
+    | '/roadmap'
+    | '/sources'
+    | '/api/chat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,11 +116,27 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   LearnRoute: typeof LearnRoute
   ReportsRoute: typeof ReportsRoute
+  RoadmapRoute: typeof RoadmapRoute
+  SourcesRoute: typeof SourcesRoute
   ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sources': {
+      id: '/sources'
+      path: '/sources'
+      fullPath: '/sources'
+      preLoaderRoute: typeof SourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports': {
       id: '/reports'
       path: '/reports'
@@ -124,8 +180,20 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   LearnRoute: LearnRoute,
   ReportsRoute: ReportsRoute,
+  RoadmapRoute: RoadmapRoute,
+  SourcesRoute: SourcesRoute,
   ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
