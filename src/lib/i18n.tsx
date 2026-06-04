@@ -611,6 +611,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
 export function useI18n() {
   const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("useI18n must be used within I18nProvider");
+  if (!ctx) {
+    // Safe fallback — used by root error/404 boundaries that may render
+    // outside the provider during SSR or initial mount.
+    return {
+      lang: "en" as Lang,
+      setLang: () => {},
+      t: (key: string) => dicts.en[key] ?? key,
+    };
+  }
   return ctx;
 }
