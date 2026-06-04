@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Drop, ShareNetwork, Lightning, UploadSimple, Globe, CaretDown, Check } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useI18n, LANGS, Lang } from "@/lib/i18n";
 
@@ -27,7 +27,7 @@ export function TopNav() {
     { to: "/roadmap", label: t("nav.roadmap") },
   ] as const;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (langOpen && langBtnRef.current) {
       const r = langBtnRef.current.getBoundingClientRect();
       setLangPos({ top: r.bottom + 6, right: window.innerWidth - r.right });
