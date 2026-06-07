@@ -188,6 +188,22 @@ const en: Dict = {
   "src.status.partial": "Partial",
   "src.status.planned": "Planned",
 
+  "src.col.updated": "Last Updated",
+  "src.col.detail": "Status Detail",
+
+  "src.detail.reason": "Reason",
+  "src.detail.timeline": "Timeline",
+  "src.detail.current": "Current data",
+  "src.detail.impact": "Impact",
+  "src.detail.trigger": "Trigger",
+  "src.detail.benefit": "Benefit",
+
+  "src.quality.title": "Data Quality & Certification",
+  "src.quality.public": "All sources are public, open-access, and citable",
+  "src.quality.verified": "Every metric is verified through 3-step validation",
+  "src.quality.timezone": "Update schedule follows UTC+5 timezone",
+  "src.quality.citation": "Citation formats available: BibTeX, APA, Chicago",
+
   // Roadmap
   "rd.title": "Future GIS Integrations",
   "rd.subtitle": "A strategic roadmap toward a national-grade water intelligence system.",
@@ -373,6 +389,22 @@ const ru: Dict = {
   "src.status.partial": "Частично",
   "src.status.planned": "Запланировано",
 
+  "src.col.updated": "Последнее обновление",
+  "src.col.detail": "Детали статуса",
+
+  "src.detail.reason": "Причина",
+  "src.detail.timeline": "Сроки",
+  "src.detail.current": "Текущие данные",
+  "src.detail.impact": "Влияние",
+  "src.detail.trigger": "Условие",
+  "src.detail.benefit": "Преимущество",
+
+  "src.quality.title": "Качество данных и сертификация",
+  "src.quality.public": "Все источники открыты, общедоступны и цитируемы",
+  "src.quality.verified": "Каждый показатель проходит 3-этапную проверку",
+  "src.quality.timezone": "График обновлений по часовому поясу UTC+5",
+  "src.quality.citation": "Форматы цитирования: BibTeX, APA, Chicago",
+
   "rd.title": "Будущие GIS-интеграции",
   "rd.subtitle": "Стратегический план развития до национального уровня водного интеллекта.",
   "rd.phase.now": "Активно",
@@ -554,6 +586,22 @@ const tj: Dict = {
   "src.status.connected": "Пайваст",
   "src.status.partial": "Қисман",
   "src.status.planned": "Нақшавӣ",
+
+  "src.col.updated": "Навсозии охирин",
+  "src.col.detail": "Тафсилоти вазъият",
+
+  "src.detail.reason": "Сабаб",
+  "src.detail.timeline": "Мӯҳлат",
+  "src.detail.current": "Маълумоти ҷорӣ",
+  "src.detail.impact": "Таъсир",
+  "src.detail.trigger": "Шарт",
+  "src.detail.benefit": "Фоида",
+
+  "src.quality.title": "Сифати маълумот ва сертификатсия",
+  "src.quality.public": "Ҳамаи манбаъҳо оммавӣ, дастрас ва овардашавандаанд",
+  "src.quality.verified": "Ҳар як нишондиҳанда тавассути тасдиқи 3-кадомӣ санҷида мешавад",
+  "src.quality.timezone": "Ҷадвали навсозӣ дар вақти UTC+5",
+  "src.quality.citation": "Форматҳои иқтибос: BibTeX, APA, Chicago",
 
   "rd.title": "Интегратсияҳои оянда",
   "rd.subtitle": "Нақшаи стратегӣ ба сӯи системаи миллии иктишофи об.",
