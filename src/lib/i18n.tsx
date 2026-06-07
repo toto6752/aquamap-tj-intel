@@ -76,8 +76,8 @@ const en: Dict = {
   "conf.updated": "Last updated",
 
   // AI Assistant
-  "ai.title": "AquaAI Assistant",
-  "ai.subtitle": "Powered by Lovable AI",
+  "ai.title": "Ask AquaAI",
+  "ai.subtitle": "Water security · glaciers · hydropower",
   "ai.welcome": "Hi! I'm **AquaAI** — your environmental intelligence assistant for Tajikistan. Ask me about glaciers, hydropower, climate, or regional water risks.",
   "ai.placeholder": "Ask about water, glaciers, climate…",
   "ai.suggested": "Suggested",
