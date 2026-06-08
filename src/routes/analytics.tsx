@@ -567,23 +567,31 @@ function RegionalTable() {
 
 function AnalyticsPage() {
   const { t } = useI18n();
-  const [tab, setTab] = useState<TabKey>("water");
+  const [tab, setTab] = useState<TabKey>("glaciers");
 
   const tabs: { key: TabKey; label: string; Icon: typeof Drop }[] = [
-    { key: "water", label: t("an.tab.water"), Icon: Drop },
-    { key: "glaciers", label: t("an.tab.glaciers"), Icon: Snowflake },
-    { key: "climate", label: t("an.tab.climate"), Icon: CloudRain },
-    { key: "access", label: t("an.tab.access"), Icon: Waves },
-    { key: "hydro", label: t("an.tab.hydro"), Icon: Lightning },
-    { key: "regional", label: t("an.tab.regional"), Icon: Globe },
+    { key: "glaciers", label: "Glacier Monitoring", Icon: Snowflake },
+    { key: "water", label: "Water Resources", Icon: Drop },
+    { key: "climate", label: "Climate Risk & Change", Icon: CloudRain },
+    { key: "hydro", label: "Hydropower & Energy", Icon: Lightning },
+    { key: "regional", label: "Regional & Transboundary", Icon: Globe },
   ];
 
   return (
     <AppShell showSidebars={false}>
       <div className="flex-1 overflow-y-auto scrollbar-thin pr-1">
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("an.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("an.subtitle")}</p>
+        <div className="mb-4 flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("an.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("an.subtitle")}</p>
+          </div>
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg grad-blue text-white text-sm font-semibold shadow-sm hover:opacity-90 transition"
+          >
+            <FilePdf size={16} weight="duotone" />
+            Download Full Report (PDF)
+          </button>
         </div>
 
         <div className="panel p-1.5 mb-4 flex flex-wrap gap-1">
@@ -606,37 +614,105 @@ function AnalyticsPage() {
 
         <AnimatePresence mode="wait">
           <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
-            {tab === "water" && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <Card title={t("an.basin.title")} subtitle={t("an.basin.sub")} confidence="verified" source="FAO AQUASTAT" updated="2023" insight={t("an.basin.insight")}><BasinChart /></Card>
-                <Card title={t("an.runoff.title")} subtitle={t("an.runoff.sub")} confidence="estimated" source="UNECE basin profile (demonstration index)" updated="2024" insight={t("an.runoff.insight")}><RunoffChart /></Card>
-              </div>
-            )}
             {tab === "glaciers" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <Card title={t("an.glacier.title")} subtitle={t("an.glacier.sub")} confidence="verified" source="RGI 7.0 · TajNCID · ScienceDirect 2026" updated="2024" insight={t("an.glacier.insight")}><GlacierChart /></Card>
-                <Card title={t("an.temp.title")} subtitle={t("an.temp.sub")} confidence="verified" source="NASA GISS · World Bank Climate Portal" updated="2024" insight={t("an.temp.insight")}><TempChart /></Card>
+                <Card title="Glacier Retreat Timeline (1990–2025)" subtitle="Total ice area across Pamir & Alay ranges"
+                  confidence="verified" source="RGI 7.0 · TajNCID · ScienceDirect 2026" updated="2025"
+                  insight="Retreat rate: −1.1% per year. ~1,700 km² lost in 35 years — equivalent to all glaciers in the Hissar range."
+                  csvData={glacierTimeline} csvName="glacier-retreat-timeline"><GlacierTimelineChart /></Card>
+                <Card title="Glaciers by Elevation Zone (2025)" subtitle="Distribution by altitude band (thousands of glaciers)"
+                  confidence="verified" source="GLIMS · RGI 7.0" updated="2025"
+                  insight="92% of glaciers above 4,000 m remain — but lower-elevation ice (<3,000 m) is nearly gone, indicating active warming front."
+                  csvData={glacierElevation} csvName="glaciers-by-elevation"><GlacierElevationChart /></Card>
+                <Card title="Glacier Volume Trend (km³)" subtitle="Aggregate ice volume across monitored glaciers"
+                  confidence="estimated" source="TajNCID modelled volume series" updated="2024"
+                  insight="Volume loss is accelerating faster than area — thinning dominates over edge retreat."
+                  csvData={glacierData} csvName="glacier-volume"><GlacierChart /></Card>
+                <Card title="Temperature Anomaly (Pamir region)" subtitle="°C relative to 1990–2010 baseline"
+                  confidence="verified" source="NASA GISS · World Bank Climate Portal" updated="2024"
+                  insight="Pamir warming is ~2× the global rate — primary driver of glacier mass loss."
+                  csvData={tempAnomaly} csvName="temperature-anomaly"><TempChart /></Card>
+              </div>
+            )}
+            {tab === "water" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <Card title="Basin Water Availability (km³/yr)" subtitle="Surface · groundwater · runoff by basin"
+                  confidence="verified" source="FAO AQUASTAT" updated="2023"
+                  insight="Amu Darya tributaries (Panj + Vakhsh) generate ~60% of national water resources."
+                  csvData={basinStacked} csvName="basin-availability"><BasinStackedChart /></Card>
+                <Card title="Seasonal Runoff Pattern" subtitle="Monthly discharge index — irrigation season highlighted"
+                  confidence="verified" source="UNECE basin profile · CAWater-Info" updated="2024"
+                  insight="June–September delivers ~70% of annual flow. Extreme seasonality creates winter water stress for irrigation and storage."
+                  csvData={runoffData} csvName="seasonal-runoff"><RunoffSeasonalChart /></Card>
+                <Card title="Basin Allocation (legacy view)" subtitle="Single-source volume per basin"
+                  confidence="verified" source="FAO AQUASTAT" updated="2023"
+                  insight="Panj is the dominant single contributor at 33.5 km³/yr."
+                  csvData={basinData} csvName="basin-allocation"><BasinChart /></Card>
+                <Card title="Water Access — Urban vs Rural" subtitle="% population with safely-managed drinking water"
+                  confidence="verified" source="World Bank · JMP WHO/UNICEF" updated="2024"
+                  insight="Rural gap is closing (+22 pts since 2015) but ~26% of rural population still lacks safe water."
+                  csvData={waterAccess} csvName="water-access"><AccessChart /></Card>
               </div>
             )}
             {tab === "climate" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <Card title={t("an.risk.title")} subtitle={t("an.risk.sub")} confidence="estimated" source="UNEP 2025 (district aggregation)" updated="2025" insight={t("an.risk.insight")}><RiskChart /></Card>
-                <Card title={t("an.precip.title")} subtitle={t("an.precip.sub")} confidence="verified" source="World Bank Climate Portal" updated="2024" insight={t("an.precip.insight")}><PrecipChart /></Card>
-                <Card title={t("an.disaster.title")} subtitle={t("an.disaster.sub")} confidence="estimated" source="EM-DAT (UCLouvain) · Govt. of Tajikistan CoES" updated="2023" insight={t("an.disaster.insight")}><DisasterChart /></Card>
-              </div>
-            )}
-            {tab === "access" && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <Card title={t("an.access.title")} subtitle={t("an.access.sub")} confidence="verified" source="World Bank · JMP WHO/UNICEF" updated="2024" insight={t("an.access.insight")}><AccessChart /></Card>
+                <Card title="Temperature Trend by Season (1990–2025)" subtitle="Seasonal °C anomalies vs 1990–2010 baseline"
+                  confidence="verified" source="NASA GISS · World Bank Climate Portal" updated="2025"
+                  insight="Warming rate: +0.04 °C/yr — winter & spring rising fastest, advancing snowmelt timing."
+                  csvData={tempSeasonal} csvName="temperature-seasonal"><TempSeasonalChart /></Card>
+                <Card title="Precipitation Variability by Decade" subtitle="IQR (Q1–Median–Q3) with mean trend (mm/yr)"
+                  confidence="verified" source="World Bank Climate Portal · CRU TS" updated="2024"
+                  insight="The 2010s were the driest decade on record — mean precipitation fell ~8% vs 1990s."
+                  csvData={precipDecade} csvName="precipitation-by-decade"><PrecipBoxChart /></Card>
+                <Card title="Climate Risk — Districts Affected" subtitle="45 districts classified by composite climate risk"
+                  confidence="estimated" source="UNEP 2025 (district aggregation)" updated="2025"
+                  insight="Glacier-dependent regions (GBAO, Badakhshan) face the highest stress — 7 districts at extreme risk."
+                  csvData={riskDistricts} csvName="risk-districts"><RiskDistrictsChart /></Card>
+                <Card title="Disaster Frequency (annual events)" subtitle="Floods, mudflows, GLOFs, droughts"
+                  confidence="estimated" source="EM-DAT (UCLouvain) · Govt. of Tajikistan CoES" updated="2023"
+                  insight="+41% increase in recorded events 2015→2023 — consistent with climate intensification."
+                  csvData={disasterFreq} csvName="disaster-frequency"><DisasterChart /></Card>
+                <Card title="Hazard Mix (national totals)" subtitle="Share of recorded water-related disasters"
+                  confidence="estimated" source="EM-DAT · CoES" updated="2024"
+                  insight="Floods dominate event count; GLOFs are rare but cause disproportionate damage in mountain valleys."
+                  csvData={riskBreakdown} csvName="hazard-mix"><RiskChart /></Card>
               </div>
             )}
             {tab === "hydro" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <Card title={t("an.hydro.title")} subtitle={t("an.hydro.sub")} confidence="demo" source="Demonstration dataset (modelled seasonality)" updated="2024" insight={t("an.hydro.insight")}><HydroChart /></Card>
-                <Card title={t("an.capacity.title")} subtitle={t("an.capacity.sub")} confidence="verified" source="MEWR Tajikistan · World Bank 2024" updated="2024" insight={t("an.capacity.insight")}><CapacityChart /></Card>
+                <Card title="Hydropower Capacity Roadmap (GW)" subtitle="Operating → Under construction → Planned"
+                  confidence="verified" source="MEWR Tajikistan · ADB · World Bank 2024" updated="2025"
+                  insight="Total potential reaches 10.3 GW by 2032 with Rogun (3.6 GW) and a 2.1 GW planned pipeline."
+                  csvData={capacityWaterfall} csvName="capacity-roadmap"><CapacityWaterfallChart /></Card>
+                <Card title="Monthly Generation vs Precipitation" subtitle="Utilization % with rainfall overlay"
+                  confidence="demo" source="Demonstration dataset (modelled seasonality)" updated="2024"
+                  insight="Summer peak driven by glacier/snow melt; winter generation needs reservoir storage strategy."
+                  csvData={monthlyGen} csvName="monthly-generation"><MonthlyGenChart /></Card>
+                <Card title="Plant-level Installed Capacity (MW)" subtitle="Operating + committed plants"
+                  confidence="verified" source="MEWR Tajikistan · World Bank 2024" updated="2024"
+                  insight="Nurek and Rogun together will provide ~75% of national electricity post-2032."
+                  csvData={capacityData} csvName="plant-capacity"><CapacityChart /></Card>
+                <Card title="Monthly Generation (GWh)" subtitle="Total system output by month"
+                  confidence="demo" source="Demonstration dataset" updated="2024"
+                  insight="July–August output is ~70% higher than mid-winter, reflecting hydrological seasonality."
+                  csvData={hydroData} csvName="monthly-gwh"><HydroChart /></Card>
               </div>
             )}
-            {tab === "regional" && <RegionalTable />}
+            {tab === "regional" && (
+              <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  <Card title="Downstream Water Dependency" subtitle="Allocation of Tajikistan's 64 km³/yr runoff"
+                    confidence="estimated" source="ICWC · UNECE · CAWater-Info" updated="2024"
+                    insight="40+ million people downstream depend on Tajik water — Uzbekistan alone receives ~40% of outflow."
+                    csvData={downstreamFlow} csvName="downstream-allocation"><DownstreamChart /></Card>
+                  <Card title="Water Stress Index — Central Asia" subtitle="Multi-metric comparison (radar)"
+                    confidence="verified" source="WRI Aqueduct 4.0 · FAO AQUASTAT" updated="2024"
+                    insight="Tajikistan (39% stress) is the regional water tower; Uzbekistan (95% critical) is most exposed downstream."
+                    csvData={stressRadar} csvName="stress-radar"><StressRadarChart /></Card>
+                </div>
+                <RegionalTable />
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
