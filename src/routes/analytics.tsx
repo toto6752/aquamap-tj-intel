@@ -356,6 +356,169 @@ function CapacityChart() { return (
   </ResponsiveContainer>
 ); }
 
+// --- New charts ---
+function GlacierTimelineChart() { return (
+  <ResponsiveContainer>
+    <LineChart data={glacierTimeline}>
+      <CartesianGrid stroke="#eef2f7" vertical={false} />
+      <XAxis dataKey="year" {...axis} />
+      <YAxis {...axis} domain={[13000, 15500]} />
+      <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string, p) => n === "area"
+        ? [`${v.toLocaleString()} km² · loss ${p.payload.loss} km²`, "Glacier area"] : [v, n]} />
+      <Line type="monotone" dataKey="area" stroke="#4a8cd6" strokeWidth={2.5} dot={{ r: 3 }} />
+    </LineChart>
+  </ResponsiveContainer>
+); }
+
+function GlacierElevationChart() { return (
+  <ResponsiveContainer>
+    <BarChart data={glacierElevation} layout="vertical" margin={{ left: 30 }}>
+      <CartesianGrid stroke="#eef2f7" horizontal={false} />
+      <XAxis type="number" {...axis} />
+      <YAxis type="category" dataKey="zone" {...axis} width={110} />
+      <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v.toFixed(2)}k glaciers`, "Count"]} />
+      <Bar dataKey="count" radius={[0, 6, 6, 0]}>
+        {glacierElevation.map((d) => <Cell key={d.zone} fill={d.fill} />)}
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+); }
+
+function BasinStackedChart() { return (
+  <ResponsiveContainer>
+    <BarChart data={basinStacked}>
+      <CartesianGrid stroke="#eef2f7" vertical={false} />
+      <XAxis dataKey="name" {...axis} />
+      <YAxis {...axis} />
+      <Tooltip contentStyle={tooltipStyle} />
+      <Legend wrapperStyle={{ fontSize: 11 }} />
+      <Bar dataKey="surface" stackId="a" name="Surface water" fill="#4a8cd6" radius={[0, 0, 0, 0]} />
+      <Bar dataKey="groundwater" stackId="a" name="Groundwater" fill="#7c5cff" />
+      <Bar dataKey="runoff" stackId="a" name="Runoff" fill="#2f9c5b" radius={[6, 6, 0, 0]} />
+    </BarChart>
+  </ResponsiveContainer>
+); }
+
+function RunoffSeasonalChart() { return (
+  <ResponsiveContainer>
+    <AreaChart data={runoffData}>
+      <defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#4a8cd6" stopOpacity={0.55} />
+        <stop offset="100%" stopColor="#4a8cd6" stopOpacity={0} />
+      </linearGradient></defs>
+      <CartesianGrid stroke="#eef2f7" vertical={false} />
+      <XAxis dataKey="m" {...axis} /><YAxis {...axis} />
+      <Tooltip contentStyle={tooltipStyle} />
+      <ReferenceArea x1="Jun" x2="Sep" fill="#f3a847" fillOpacity={0.15} label={{ value: "70% annual flow", fontSize: 10, fill: "#a86a1a" }} />
+      <Area type="monotone" dataKey="v" stroke="#1f4e7a" strokeWidth={2.5} fill="url(#g3)" />
+    </AreaChart>
+  </ResponsiveContainer>
+); }
+
+function TempSeasonalChart() { return (
+  <ResponsiveContainer>
+    <LineChart data={tempSeasonal}>
+      <CartesianGrid stroke="#eef2f7" vertical={false} />
+      <XAxis dataKey="y" {...axis} /><YAxis {...axis} unit="°C" />
+      <Tooltip contentStyle={tooltipStyle} />
+      <Legend wrapperStyle={{ fontSize: 11 }} />
+      <Line type="monotone" dataKey="annual" stroke="#e85d5d" strokeWidth={2.5} dot={false} />
+      <Line type="monotone" dataKey="spring" stroke="#2f9c5b" strokeWidth={1.5} dot={false} />
+      <Line type="monotone" dataKey="summer" stroke="#f3a847" strokeWidth={1.5} dot={false} />
+      <Line type="monotone" dataKey="autumn" stroke="#7c5cff" strokeWidth={1.5} dot={false} />
+      <Line type="monotone" dataKey="winter" stroke="#4a8cd6" strokeWidth={1.5} dot={false} />
+    </LineChart>
+  </ResponsiveContainer>
+); }
+
+function PrecipBoxChart() { return (
+  <ResponsiveContainer>
+    <ComposedChart data={precipDecade}>
+      <CartesianGrid stroke="#eef2f7" vertical={false} />
+      <XAxis dataKey="decade" {...axis} /><YAxis {...axis} unit="mm" />
+      <Tooltip contentStyle={tooltipStyle} />
+      <Legend wrapperStyle={{ fontSize: 11 }} />
+      <Bar dataKey="q1" stackId="b" fill="transparent" name="" legendType="none" />
+      <Bar dataKey="median" stackId="b" name="IQR (Q1→Median)" fill="#a8c8e8" />
+      <Bar dataKey="q3" stackId="b" name="IQR (Median→Q3)" fill="#4a8cd6" />
+      <Line type="monotone" dataKey="avg" name="Mean trend" stroke="#e85d5d" strokeWidth={2.5} dot={{ r: 3 }} />
+    </ComposedChart>
+  </ResponsiveContainer>
+); }
+
+function RiskDistrictsChart() { return (
+  <ResponsiveContainer>
+    <BarChart data={riskDistricts}>
+      <CartesianGrid stroke="#eef2f7" vertical={false} />
+      <XAxis dataKey="level" {...axis} interval={0} tick={{ fontSize: 10 }} />
+      <YAxis {...axis} />
+      <Tooltip contentStyle={tooltipStyle} />
+      <Bar dataKey="n" radius={[6, 6, 0, 0]}>
+        {riskDistricts.map((d) => <Cell key={d.level} fill={d.fill} />)}
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+); }
+
+function CapacityWaterfallChart() { return (
+  <ResponsiveContainer>
+    <BarChart data={capacityWaterfall}>
+      <CartesianGrid stroke="#eef2f7" vertical={false} />
+      <XAxis dataKey="phase" {...axis} interval={0} tick={{ fontSize: 10 }} />
+      <YAxis {...axis} unit=" GW" />
+      <Tooltip contentStyle={tooltipStyle} />
+      <Bar dataKey="value" radius={[6, 6, 0, 0]} label={{ position: "top", fontSize: 11, fill: "#1f2937" }}>
+        {capacityWaterfall.map((d) => <Cell key={d.phase} fill={d.fill} />)}
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+); }
+
+function MonthlyGenChart() { return (
+  <ResponsiveContainer>
+    <ComposedChart data={monthlyGen}>
+      <CartesianGrid stroke="#eef2f7" vertical={false} />
+      <XAxis dataKey="m" {...axis} />
+      <YAxis yAxisId="left" {...axis} unit="%" />
+      <YAxis yAxisId="right" orientation="right" {...axis} unit="mm" />
+      <Tooltip contentStyle={tooltipStyle} />
+      <Legend wrapperStyle={{ fontSize: 11 }} />
+      <Bar yAxisId="left" dataKey="util" name="Utilization %" fill="#7c5cff" radius={[6, 6, 0, 0]} />
+      <Line yAxisId="right" type="monotone" dataKey="precip" name="Precipitation (mm)" stroke="#4a8cd6" strokeWidth={2.5} dot={{ r: 3 }} />
+    </ComposedChart>
+  </ResponsiveContainer>
+); }
+
+function DownstreamChart() { return (
+  <ResponsiveContainer>
+    <BarChart data={downstreamFlow} layout="vertical" margin={{ left: 30 }}>
+      <CartesianGrid stroke="#eef2f7" horizontal={false} />
+      <XAxis type="number" {...axis} unit=" km³" />
+      <YAxis type="category" dataKey="country" {...axis} width={170} tick={{ fontSize: 10 }} />
+      <Tooltip contentStyle={tooltipStyle} formatter={(v: number, _n, p) => [`${v} km³ · ${p.payload.pct}%`, "Allocation"]} />
+      <Bar dataKey="km3" radius={[0, 6, 6, 0]} label={{ position: "right", fontSize: 11, formatter: (v: number) => `${v} km³` }}>
+        {downstreamFlow.map((d) => <Cell key={d.country} fill={d.fill} />)}
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+); }
+
+function StressRadarChart() { return (
+  <ResponsiveContainer>
+    <RadarChart data={stressRadar} outerRadius="75%">
+      <PolarGrid stroke="#dde5ef" />
+      <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11, fill: "#5a6b85" }} />
+      <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 9, fill: "#8a99b3" }} />
+      <Radar name="Tajikistan" dataKey="Tajikistan" stroke="#2f9c5b" fill="#2f9c5b" fillOpacity={0.3} />
+      <Radar name="Uzbekistan" dataKey="Uzbekistan" stroke="#e85d5d" fill="#e85d5d" fillOpacity={0.25} />
+      <Radar name="Kazakhstan" dataKey="Kazakhstan" stroke="#4a8cd6" fill="#4a8cd6" fillOpacity={0.2} />
+      <Radar name="Turkmenistan" dataKey="Turkmenistan" stroke="#f3a847" fill="#f3a847" fillOpacity={0.2} />
+      <Legend wrapperStyle={{ fontSize: 11 }} />
+      <Tooltip contentStyle={tooltipStyle} />
+    </RadarChart>
+  </ResponsiveContainer>
+); }
+
 function RegionalTable() {
   const { t } = useI18n();
   const riskLabel = { high: t("risk.high"), moderate: t("risk.moderate"), low: t("risk.low") };
