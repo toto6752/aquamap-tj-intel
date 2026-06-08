@@ -1,17 +1,22 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useLayers } from "../layout/LayerContext";
+import { useLayers, LayerKey } from "../layout/LayerContext";
 import { useI18n } from "@/lib/i18n";
 import {
   regions, rivers, glaciers, hydropower, riskZones, reservoirs,
   populationCenters, agriculturalZones, protectedAreas,
 } from "@/lib/mock-data";
 
-const basemaps = {
+const basemaps: Record<string, string | string[]> = {
   light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
   terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
   satellite: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  hybrid: [
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+  ],
+  dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
 };
 
 const riskColor = { high: "#e85d5d", moderate: "#f3a847", low: "#54b97a" };
@@ -19,10 +24,22 @@ const riskColor = { high: "#e85d5d", moderate: "#f3a847", low: "#54b97a" };
 export function MapView() {
   const ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const tileRef = useRef<L.TileLayer | null>(null);
+  const tileRef = useRef<L.TileLayer[]>([]);
   const layerGroupsRef = useRef<Record<string, L.LayerGroup>>({});
-  const { layers, basemap } = useLayers();
+  const queryGroupRef = useRef<L.LayerGroup | null>(null);
+  const { layers, basemap, opacity, query, highlightLayer } = useLayers();
   const { t, lang } = useI18n();
+
+  const addTiles = (map: L.Map, key: string) => {
+    tileRef.current.forEach((tl) => map.removeLayer(tl));
+    tileRef.current = [];
+    const urls = basemaps[key] ?? basemaps.light;
+    const arr = Array.isArray(urls) ? urls : [urls];
+    arr.forEach((u) => {
+      const tl = L.tileLayer(u, { maxZoom: 18, attribution: "© OpenStreetMap · Esri · CartoDB" }).addTo(map);
+      tileRef.current.push(tl);
+    });
+  };
 
   // Rebuild popups when language changes
   useEffect(() => {
@@ -35,8 +52,9 @@ export function MapView() {
       center: [38.86, 71.27], zoom: 7, zoomControl: false, attributionControl: true,
     });
     L.control.zoom({ position: "topright" }).addTo(map);
-    tileRef.current = L.tileLayer(basemaps[basemap], { maxZoom: 18, attribution: "© OSM" }).addTo(map);
+    addTiles(map, basemap);
     mapRef.current = map;
+    (window as unknown as { __aquaMap?: L.Map }).__aquaMap = map;
 
     const groups: Record<string, L.LayerGroup> = {
       regions: L.layerGroup().addTo(map),
@@ -51,6 +69,7 @@ export function MapView() {
       protected: L.layerGroup().addTo(map),
     };
     layerGroupsRef.current = groups;
+    queryGroupRef.current = L.layerGroup().addTo(map);
 
     regions.forEach((r) => {
       const poly = L.polygon(r.polygon, {
@@ -151,9 +170,8 @@ export function MapView() {
 
   // Sync basemap
   useEffect(() => {
-    if (!mapRef.current || !tileRef.current) return;
-    mapRef.current.removeLayer(tileRef.current);
-    tileRef.current = L.tileLayer(basemaps[basemap], { maxZoom: 18, attribution: "© OSM" }).addTo(mapRef.current);
+    if (!mapRef.current) return;
+    addTiles(mapRef.current, basemap);
   }, [basemap]);
 
   // Sync layer visibility
@@ -168,6 +186,57 @@ export function MapView() {
       else { if (map.hasLayer(g)) map.removeLayer(g); }
     });
   }, [layers]);
+
+  // Sync per-layer opacity
+  useEffect(() => {
+    const groups = layerGroupsRef.current;
+    (Object.keys(opacity) as LayerKey[]).forEach((k) => {
+      const g = groups[k];
+      if (!g) return;
+      const o = (opacity[k] ?? 100) / 100;
+      g.eachLayer((layer) => {
+        const anyL = layer as unknown as { setOpacity?: (n: number) => void; setStyle?: (s: object) => void };
+        if (typeof anyL.setOpacity === "function") anyL.setOpacity(o);
+        if (typeof anyL.setStyle === "function") anyL.setStyle({ opacity: o, fillOpacity: o * 0.35 });
+      });
+    });
+  }, [opacity]);
+
+  // Legend hover highlight
+  useEffect(() => {
+    const groups = layerGroupsRef.current;
+    Object.entries(groups).forEach(([k, g]) => {
+      g.eachLayer((layer) => {
+        const anyL = layer as unknown as { setStyle?: (s: object) => void };
+        if (typeof anyL.setStyle !== "function") return;
+        if (!highlightLayer) anyL.setStyle({ weight: 1.5 });
+        else if (k === highlightLayer) anyL.setStyle({ weight: 4 });
+        else anyL.setStyle({ weight: 1 });
+      });
+    });
+  }, [highlightLayer]);
+
+  // Spatial query highlights
+  useEffect(() => {
+    const qg = queryGroupRef.current;
+    if (!qg) return;
+    qg.clearLayers();
+    if (!query.active) return;
+    regions.forEach((r) => {
+      const glacierRetreat = r.name.includes("Badakhshan") ? 8 : r.name.includes("Khatlon") ? 3 : 4;
+      const popDensity = r.name.includes("Sughd") ? 90 : r.name.includes("Khatlon") ? 130 : r.name.includes("Badakhshan") ? 4 : 60;
+      const okAccess = !query.accessMaxOn || r.access < query.accessMax;
+      const okGlacier = !query.glacierRetreatOn || glacierRetreat > query.glacierRetreatMin;
+      const okPop = !query.popDensityOn || popDensity > query.popDensityMin;
+      const okRisk = !query.riskOn || r.risk === "high";
+      if (okAccess && okGlacier && okPop && okRisk) {
+        L.polygon(r.polygon, {
+          color: "#7c5cff", weight: 3, dashArray: "6 4",
+          fillColor: "#7c5cff", fillOpacity: 0.22,
+        }).bindTooltip(`✓ Matches query · ${r.name}`, { sticky: true }).addTo(qg);
+      }
+    });
+  }, [query]);
 
   return <div ref={ref} className="absolute inset-0" />;
 }
