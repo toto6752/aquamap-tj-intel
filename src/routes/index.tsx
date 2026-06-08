@@ -3,6 +3,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { MapClient } from "@/components/map/MapClient";
 import { MapLegend } from "@/components/map/MapLegend";
 import { BasemapSwitcher } from "@/components/map/BasemapSwitcher";
+import { MapTools } from "@/components/map/MapTools";
 import { StatsCards } from "@/components/stats/StatsCards";
 
 export const Route = createFileRoute("/")({
@@ -23,8 +24,9 @@ function Index() {
       <div className="flex-1 flex flex-col gap-3 min-h-0">
         <div className="relative flex-1 min-h-[420px] rounded-2xl overflow-hidden panel">
           <MapClient />
-          <div className="absolute top-3 left-3 z-[400]">
+          <div className="absolute top-3 left-3 z-[400] flex flex-col gap-2">
             <BasemapSwitcher />
+            <div className="relative"><MapTools /></div>
           </div>
           <div className="absolute bottom-3 left-3 z-[400]">
             <MapLegend />
