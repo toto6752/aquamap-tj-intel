@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Drop, Snowflake, Lightning, CloudRain, Globe, Flask,
-  ArrowSquareOut,
+  ArrowSquareOut, MapPin, ChartLine, Clock, Scales,
 } from "@phosphor-icons/react";
 import { useI18n } from "@/lib/i18n";
+import { regions } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/learn")({
   head: () => ({
@@ -34,6 +36,8 @@ interface TabContent {
   highlights: Stat[];
   sections: Section[];
   links?: { label: string; href: string }[];
+  facts?: { text: string; source: string; href: string }[];
+  related?: { label: string; to: string }[];
 }
 
 const tabs: TabContent[] = [
@@ -54,6 +58,15 @@ const tabs: TabContent[] = [
       { h: "Water Allocation", body: "Under the ICWC framework, Tajikistan receives only 15–18% of the allocable Amu Darya flow despite generating ~55% of total basin water — a recurring source of regional tension." },
       { h: "Transboundary Issues", body: "Tajikistan supplies water to Uzbekistan, Kazakhstan, Afghanistan, Turkmenistan, and Kyrgyzstan. Summer/winter trade-offs between irrigation (downstream) and energy (upstream) drive policy negotiation." },
     ],
+    facts: [
+      { text: "Tajikistan has 947 rivers totalling ~28,500 km of length.", source: "World Bank Open Data 2024", href: "https://data.worldbank.org/country/TJ" },
+      { text: "Annual runoff: 64 km³ — one of the highest per-capita volumes in Central Asia.", source: "FAO AQUASTAT 2025", href: "https://www.fao.org/aquastat/" },
+      { text: "Generates 55.4% of Aral Sea basin water but receives only 15–18% via the ICWC allocation framework.", source: "UNECE Water Convention 2024", href: "https://unece.org/water" },
+    ],
+    related: [
+      { label: "Basin Water Availability", to: "/analytics" },
+      { label: "Seasonal Runoff Pattern", to: "/analytics" },
+    ],
   },
   {
     key: "glaciers", emoji: "🏔️", tKey: "learn.tab.glaciers", Icon: Snowflake, color: "text-glacier", bg: "bg-glacier/15",
@@ -72,6 +85,15 @@ const tabs: TabContent[] = [
       { h: "Why It Matters", body: "Glaciers contribute up to 25% of summer runoff for the Amu Darya basin, serving 70M+ people downstream across Central Asia and northern Afghanistan." },
       { h: "Future Projections", body: "Pyanj basin: -75.5% glacier volume by 2050. Vakhsh basin: -53%. Amu Darya total runoff projected to fall 30% by mid-century after a temporary 'peak water' window." },
     ],
+    facts: [
+      { text: "13,542 glaciers covering ~13,542 km² as of 2025 (down from ~15,240 km² in 1990).", source: "RGI 7.0 · TajNCID", href: "https://www.glims.org/rgi_user_guide/welcome.html" },
+      { text: "Vanjyakh (Fedchenko) — the world's 10th largest glacier — is melting up to 16 m/year.", source: "ScienceDirect 2026", href: "https://www.sciencedirect.com/" },
+      { text: "Pyanj basin projected to lose −75.5% of glacier volume by 2050.", source: "UNEP Atlas 2025", href: "https://www.unep.org/" },
+    ],
+    related: [
+      { label: "Glacier Retreat Timeline", to: "/analytics" },
+      { label: "Glaciers by Elevation Zone", to: "/analytics" },
+    ],
   },
   {
     key: "hydro", emoji: "⚡", tKey: "learn.tab.hydro", Icon: Lightning, color: "text-hydro", bg: "bg-hydro/10",
@@ -88,6 +110,15 @@ const tabs: TabContent[] = [
       { h: "Rogun HPP", body: "Under construction on the Vakhsh, upstream of Nurek. 335 m — will be the world's tallest dam. 3,780 MW planned. World Bank approved a $350M grant in December 2024. Full completion targeted ~2033." },
       { h: "Other Plants", body: "Sangtuda-1 (670 MW), Sangtuda-2 (220 MW), Baipaza (600 MW), Qairokkum (126 MW) round out the operational fleet, alongside many small hydro stations in GBAO and Sughd." },
       { h: "Grid & Export", body: "95%+ of electricity comes from hydropower. Tajikistan exports surplus summer generation to Uzbekistan, Afghanistan, and Pakistan via CASA-1000 (Central Asia–South Asia transmission)." },
+    ],
+    facts: [
+      { text: "527 TWh/year estimated potential — only ~3% currently utilised.", source: "MEWR Tajikistan", href: "https://mewr.tj/" },
+      { text: "Rogun Dam will reach 335 m — the tallest dam in the world — and add 3.6 GW of capacity.", source: "World Bank 2024", href: "https://www.worldbank.org/en/country/tajikistan" },
+      { text: "95%+ of national electricity is generated from hydropower; CASA-1000 exports to PK/AF.", source: "ADB Energy Outlook", href: "https://www.adb.org/" },
+    ],
+    related: [
+      { label: "Hydropower Capacity Roadmap", to: "/analytics" },
+      { label: "Monthly Generation vs Precipitation", to: "/analytics" },
     ],
   },
   {
@@ -108,6 +139,15 @@ const tabs: TabContent[] = [
       { h: "Sarez Lake Risk", body: "Formed by the 1911 Usoi landslide. Holds 17 km³ of water. A breach could cascade through the Bartang–Panj–Amu Darya system, threatening millions downstream." },
       { h: "2025 Milestones", body: "The UN General Assembly declared 2025 the International Year of Glaciers' Preservation at Tajikistan's urging. The Dushanbe Glaciers Declaration was signed the same year." },
     ],
+    facts: [
+      { text: "Temperature has risen +1.2 °C since baseline — roughly 2× the global average.", source: "World Bank Climate Portal", href: "https://climateknowledgeportal.worldbank.org/country/tajikistan" },
+      { text: "1,826 natural disasters recorded between 2020–2023, with $30M+ in annual losses.", source: "EM-DAT / CoES Tajikistan", href: "https://www.emdat.be/" },
+      { text: "Sarez Lake holds 17 km³ — a GLOF breach could cascade through the Amu Darya system.", source: "UNEP Atlas 2025", href: "https://www.unep.org/" },
+    ],
+    related: [
+      { label: "Temperature Trend by Season", to: "/analytics" },
+      { label: "Climate Risk — Districts Affected", to: "/analytics" },
+    ],
   },
   {
     key: "regional", emoji: "🌍", tKey: "learn.tab.regional", Icon: Globe, color: "text-success", bg: "bg-success/10",
@@ -126,6 +166,15 @@ const tabs: TabContent[] = [
       { h: "Transboundary Tensions", body: "Tajikistan needs winter energy storage (turbines run when reservoirs are full). Downstream Uzbekistan needs summer irrigation releases. These goals are seasonally opposite." },
       { h: "ICWC Framework", body: "The Interstate Commission for Water Coordination of Central Asia handles annual allocations between the five basin states. Talks are typically tense and politically charged." },
       { h: "International Year 2025", body: "On Tajikistan's initiative, the UN declared 2025 the International Year of Glaciers' Preservation — a global awareness campaign anchored by the Dushanbe Water Process." },
+    ],
+    facts: [
+      { text: "Tajikistan supplies 60%+ of Central Asia's freshwater to 40M+ downstream residents.", source: "UNECE 2024", href: "https://unece.org/water" },
+      { text: "Uzbekistan receives ~40% of Tajik outflow; Kyrgyzstan and Kazakhstan share another 45%.", source: "ICWC · CAWater-Info", href: "http://www.cawater-info.net/" },
+      { text: "2025 declared the UN International Year of Glaciers' Preservation — at Tajikistan's initiative.", source: "UN General Assembly", href: "https://www.un.org/" },
+    ],
+    related: [
+      { label: "Downstream Water Dependency", to: "/analytics" },
+      { label: "Water Stress Index — Central Asia", to: "/analytics" },
     ],
   },
   {
@@ -154,6 +203,126 @@ const tabs: TabContent[] = [
     ],
   },
 ];
+
+const timelineEvents: { year: string; title: string; body: string }[] = [
+  { year: "1924", title: "Soviet dam construction begins", body: "Early Soviet-era infrastructure on the Vakhsh & Syr Darya basins lays the groundwork for centrally-planned irrigation and energy systems." },
+  { year: "1972", title: "Nurek HPP commissioned", body: "300 m dam on the Vakhsh becomes the tallest in the world at the time — provides 70%+ of national electricity for decades." },
+  { year: "1991", title: "Independence; water conflicts emerge", body: "Collapse of Soviet allocation regime triggers transboundary tensions over Amu Darya and Syr Darya flows." },
+  { year: "2007", title: "ICWC framework formalised", body: "The Interstate Commission for Water Coordination sets annual basin allocations — Tajikistan receives 15–18% of Amu Darya despite generating ~55%." },
+  { year: "2018", title: "Rogun first unit online", body: "First two turbines of Rogun HPP begin operation; full 3.6 GW capacity targeted by 2032." },
+  { year: "2025", title: "UN Year of Glaciers' Preservation", body: "Declared at Tajikistan's initiative; the Dushanbe Glaciers Declaration is signed." },
+  { year: "2032", title: "Rogun phase 1 complete (projected)", body: "Total national hydropower capacity reaches ~10.3 GW; CASA-1000 exports scaled up." },
+  { year: "2050", title: "Projected glacier loss milestone", body: "Pyanj basin glacier volume projected to fall by 75.5%; Amu Darya runoff begins post-peak decline." },
+];
+
+function HistoricalTimeline() {
+  const [active, setActive] = useState(0);
+  return (
+    <div className="panel p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-9 h-9 rounded-lg bg-primary-soft text-primary grid place-items-center"><Clock size={18} weight="duotone" /></div>
+        <div>
+          <h3 className="text-[15px] font-bold text-foreground">Historical Timeline</h3>
+          <p className="text-[11.5px] text-muted-foreground">Century of water policy & infrastructure milestones</p>
+        </div>
+      </div>
+      <div className="relative overflow-x-auto pb-2 scrollbar-thin">
+        <div className="absolute left-0 right-0 top-[26px] h-0.5 bg-border" />
+        <div className="relative flex gap-6 min-w-max px-2">
+          {timelineEvents.map((e, i) => (
+            <button
+              key={e.year}
+              onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onClick={() => setActive(i)}
+              className="flex flex-col items-center w-[88px] group"
+            >
+              <div className={`w-4 h-4 rounded-full border-2 border-card shadow-sm transition ${i === active ? "bg-primary scale-125" : "bg-muted-foreground/60 group-hover:bg-primary"}`} />
+              <div className={`mt-2 text-[11.5px] font-bold tabular-nums ${i === active ? "text-primary" : "text-foreground"}`}>{e.year}</div>
+              <div className="text-[10.5px] text-muted-foreground text-center leading-tight mt-0.5 line-clamp-2">{e.title}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+      <motion.div
+        key={active}
+        initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
+        className="mt-4 panel p-3.5 bg-secondary/40 border-border"
+      >
+        <div className="text-[12.5px] font-semibold text-foreground">
+          <span className="text-primary">{timelineEvents[active].year}</span> · {timelineEvents[active].title}
+        </div>
+        <div className="text-[12px] text-muted-foreground leading-relaxed mt-1">{timelineEvents[active].body}</div>
+      </motion.div>
+    </div>
+  );
+}
+
+function RegionalCompare() {
+  const [selected, setSelected] = useState<string[]>([regions[0].name, regions[3].name]);
+  const toggle = (name: string) => {
+    setSelected((s) => s.includes(name) ? s.filter((x) => x !== name) : s.length < 3 ? [...s, name] : s);
+  };
+  const rows = regions.filter((r) => selected.includes(r.name));
+  const synth = (r: typeof regions[number]) => {
+    const glacier = r.name.includes("Badakhshan") ? "High (Pamir)" : r.name.includes("DRS") || r.name.includes("Republican") ? "Medium" : "Low";
+    const hydro = r.name.includes("Khatlon") ? "Nurek · Sangtuda" : r.name.includes("Republican") || r.name.includes("DRS") ? "Rogun" : r.name.includes("Sughd") ? "Qairokkum" : "Micro-hydro";
+    const climate = r.risk === "high" ? "Extreme" : r.risk === "moderate" ? "Elevated" : "Stable";
+    return { glacier, hydro, climate };
+  };
+  return (
+    <div className="panel p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-9 h-9 rounded-lg bg-success/10 text-success grid place-items-center"><Scales size={18} weight="duotone" /></div>
+        <div>
+          <h3 className="text-[15px] font-bold text-foreground">Regional Comparison Tool</h3>
+          <p className="text-[11.5px] text-muted-foreground">Select up to 3 regions to compare side-by-side</p>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-1.5 mb-3">
+        {regions.map((r) => {
+          const on = selected.includes(r.name);
+          return (
+            <button
+              key={r.name}
+              onClick={() => toggle(r.name)}
+              className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition border ${
+                on ? "grad-blue text-white border-transparent shadow-sm" : "border-border text-foreground hover:bg-secondary"
+              }`}
+            >{r.name}</button>
+          );
+        })}
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-[12.5px]">
+          <thead>
+            <tr className="text-[10.5px] uppercase tracking-wider text-muted-foreground border-b border-border">
+              <th className="text-left py-2 font-semibold">Metric</th>
+              {rows.map((r) => <th key={r.name} className="text-left py-2 font-semibold">{r.name}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            <CompareRow label="Capital" rows={rows} value={(r) => r.capital} />
+            <CompareRow label="Water access" rows={rows} value={(r) => `${r.access}%`} />
+            <CompareRow label="Population" rows={rows} value={(r) => r.population} />
+            <CompareRow label="Climate risk" rows={rows} value={(r) => synth(r).climate} />
+            <CompareRow label="Glacier dependence" rows={rows} value={(r) => synth(r).glacier} />
+            <CompareRow label="Hydropower assets" rows={rows} value={(r) => synth(r).hydro} />
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function CompareRow({ label, rows, value }: { label: string; rows: typeof regions; value: (r: typeof regions[number]) => string }) {
+  return (
+    <tr className="border-b border-border/60 last:border-0">
+      <td className="py-2 font-medium text-muted-foreground">{label}</td>
+      {rows.map((r) => <td key={r.name} className="py-2 text-foreground">{value(r)}</td>)}
+    </tr>
+  );
+}
 
 function LearnPage() {
   const { t } = useI18n();
@@ -238,6 +407,57 @@ function LearnPage() {
                 </motion.article>
               ))}
             </div>
+
+            {current.facts && current.facts.length > 0 && (
+              <div className="panel p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <MapPin size={16} weight="duotone" className="text-primary" />
+                  <h3 className="text-[14px] font-bold text-foreground">Key Facts</h3>
+                </div>
+                <ul className="space-y-2.5">
+                  {current.facts.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-[12.5px] text-foreground leading-relaxed">
+                      <span className="mt-1 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                      <span>
+                        {f.text}{" "}
+                        <a href={f.href} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[11.5px] font-semibold text-primary hover:underline">
+                          [{f.source}]<ArrowSquareOut size={10} weight="bold" />
+                        </a>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Link to="/" className="panel p-4 hover:bg-secondary/40 transition flex items-center gap-3 group">
+                <div className="w-11 h-11 rounded-lg grad-blue text-white grid place-items-center shrink-0">
+                  <MapPin size={20} weight="fill" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[13px] font-bold text-foreground">Explore on Interactive Map</div>
+                  <div className="text-[11.5px] text-muted-foreground">Toggle layers, query regions, and export GeoJSON.</div>
+                </div>
+                <ArrowSquareOut size={16} weight="bold" className="text-muted-foreground group-hover:text-primary transition" />
+              </Link>
+              <Link to="/analytics" className="panel p-4 hover:bg-secondary/40 transition flex items-center gap-3 group">
+                <div className="w-11 h-11 rounded-lg bg-info/10 text-info grid place-items-center shrink-0">
+                  <ChartLine size={20} weight="duotone" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[13px] font-bold text-foreground">Related Analytics</div>
+                  <div className="text-[11.5px] text-muted-foreground">
+                    {current.related?.map((r) => r.label).join(" · ") || "Open the analytics dashboard"}
+                  </div>
+                </div>
+                <ArrowSquareOut size={16} weight="bold" className="text-muted-foreground group-hover:text-primary transition" />
+              </Link>
+            </div>
+
+            {active === "regional" && <RegionalCompare />}
+            {(active === "water" || active === "hydro" || active === "climate") && <HistoricalTimeline />}
 
             {current.links && current.links.length > 0 && (
               <div className="panel p-4">
