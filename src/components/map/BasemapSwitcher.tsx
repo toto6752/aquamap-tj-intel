@@ -1,4 +1,4 @@
-import { Sun, Mountains, GlobeHemisphereEast } from "@phosphor-icons/react";
+import { Sun, Mountains, GlobeHemisphereEast, MapTrifold, Moon } from "@phosphor-icons/react";
 import { useLayers } from "../layout/LayerContext";
 import { useI18n } from "@/lib/i18n";
 
@@ -9,9 +9,11 @@ export function BasemapSwitcher() {
     { id: "light" as const, label: t("basemap.light"), Icon: Sun },
     { id: "terrain" as const, label: t("basemap.terrain"), Icon: Mountains },
     { id: "satellite" as const, label: t("basemap.satellite"), Icon: GlobeHemisphereEast },
+    { id: "hybrid" as const, label: "Hybrid", Icon: MapTrifold },
+    { id: "dark" as const, label: "Dark", Icon: Moon },
   ];
   return (
-    <div className="panel flex p-1 gap-0.5 bg-card/95 backdrop-blur-md">
+    <div className="panel flex flex-wrap p-1 gap-0.5 bg-card/95 backdrop-blur-md max-w-[420px]">
       {opts.map((o) => {
         const active = basemap === o.id;
         return (
