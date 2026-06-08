@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { I18nProvider, useI18n } from "@/lib/i18n";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   const { t } = useI18n();
@@ -114,6 +115,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <Outlet />
+        <Toaster position="bottom-right" richColors closeButton />
       </I18nProvider>
     </QueryClientProvider>
   );
