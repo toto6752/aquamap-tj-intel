@@ -2,14 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, Legend,
+  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, Legend, ComposedChart,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ReferenceArea,
 } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useRef } from "react";
+import { toPng } from "html-to-image";
 import { useI18n } from "@/lib/i18n";
 import { ConfidenceBadge, AIInsight, Confidence } from "@/components/ui/confidence-badge";
 import { regions } from "@/lib/mock-data";
-import { Drop, Snowflake, CloudRain, Waves, Lightning, Globe } from "@phosphor-icons/react";
+import { Drop, Snowflake, CloudRain, Lightning, Globe, DownloadSimple, FileCsv, Image as ImageIcon, Share, FilePdf } from "@phosphor-icons/react";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({
@@ -76,25 +78,152 @@ const capacityData = [
   { p: "Baipaza", mw: 600 }, { p: "Qairokkum", mw: 126 },
 ];
 
-type TabKey = "water" | "glaciers" | "climate" | "access" | "hydro" | "regional";
+// --- New datasets for expanded analytics ---
+const glacierTimeline = [
+  { year: "1990", area: 15240, loss: 0 },
+  { year: "1995", area: 14910, loss: 330 },
+  { year: "2000", area: 14620, loss: 290 },
+  { year: "2005", area: 14380, loss: 240 },
+  { year: "2010", area: 14180, loss: 200 },
+  { year: "2015", area: 14010, loss: 170 },
+  { year: "2020", area: 13847, loss: 163 },
+  { year: "2025", area: 13542, loss: 305 },
+];
+const glacierElevation = [
+  { zone: "2000–3000 m", count: 0.18, fill: "#e85d5d" },
+  { zone: "3000–4000 m", count: 1.42, fill: "#f3a847" },
+  { zone: "4000–5000 m", count: 6.10, fill: "#4a8cd6" },
+  { zone: "5000 m+",     count: 5.74, fill: "#1f4e7a" },
+];
+const basinStacked = [
+  { name: "Amu Darya", surface: 49.5, groundwater: 5.2, runoff: 8.8 },
+  { name: "Syr Darya", surface: 1.0, groundwater: 0.6, runoff: 0.4 },
+  { name: "Zarafshan", surface: 4.6, groundwater: 0.5, runoff: 0.7 },
+  { name: "Others",    surface: 3.1, groundwater: 0.4, runoff: 0.5 },
+];
+const tempSeasonal = [
+  { y: "1990", annual: 0.0, spring: 0.1, summer: -0.1, autumn: 0.0, winter: 0.1 },
+  { y: "1995", annual: 0.18, spring: 0.22, summer: 0.10, autumn: 0.18, winter: 0.20 },
+  { y: "2000", annual: 0.35, spring: 0.40, summer: 0.30, autumn: 0.32, winter: 0.38 },
+  { y: "2005", annual: 0.55, spring: 0.60, summer: 0.45, autumn: 0.55, winter: 0.62 },
+  { y: "2010", annual: 0.75, spring: 0.82, summer: 0.65, autumn: 0.72, winter: 0.80 },
+  { y: "2015", annual: 0.95, spring: 1.05, summer: 0.82, autumn: 0.93, winter: 1.00 },
+  { y: "2020", annual: 1.15, spring: 1.25, summer: 1.00, autumn: 1.12, winter: 1.22 },
+  { y: "2025", annual: 1.32, spring: 1.45, summer: 1.18, autumn: 1.30, winter: 1.40 },
+];
+const precipDecade = [
+  { decade: "1990s", min: 540, q1: 620, median: 705, q3: 760, max: 820, avg: 695 },
+  { decade: "2000s", min: 510, q1: 605, median: 690, q3: 745, max: 800, avg: 678 },
+  { decade: "2010s", min: 470, q1: 580, median: 645, q3: 700, max: 770, avg: 638 },
+  { decade: "2020s", min: 520, q1: 610, median: 685, q3: 735, max: 790, avg: 665 },
+];
+const riskDistricts = [
+  { level: "High (GBAO, Badakhshan)", n: 7, fill: "#cc0000" },
+  { level: "Moderate (Khatlon, DRS)", n: 18, fill: "#ff8800" },
+  { level: "Low (Sughd lowlands)",    n: 20, fill: "#00aa00" },
+];
+const capacityWaterfall = [
+  { phase: "Operating 2025", value: 4.6, fill: "#4a8cd6" },
+  { phase: "Rogun 2028–2032", value: 3.6, fill: "#7c5cff" },
+  { phase: "Other Planned", value: 2.1, fill: "#f3a847" },
+  { phase: "Total by 2032", value: 10.3, fill: "#2f9c5b" },
+];
+const monthlyGen = [
+  { m: "Jan", util: 58, precip: 62 }, { m: "Feb", util: 54, precip: 68 },
+  { m: "Mar", util: 60, precip: 88 }, { m: "Apr", util: 70, precip: 112 },
+  { m: "May", util: 82, precip: 95 }, { m: "Jun", util: 92, precip: 60 },
+  { m: "Jul", util: 96, precip: 28 }, { m: "Aug", util: 94, precip: 22 },
+  { m: "Sep", util: 84, precip: 30 }, { m: "Oct", util: 72, precip: 55 },
+  { m: "Nov", util: 64, precip: 70 }, { m: "Dec", util: 60, precip: 65 },
+];
+const downstreamFlow = [
+  { country: "Uzbekistan", pct: 40, km3: 25.6, fill: "#4a8cd6" },
+  { country: "Kyrgyzstan", pct: 25, km3: 16.0, fill: "#7c5cff" },
+  { country: "Kazakhstan", pct: 20, km3: 12.8, fill: "#2f9c5b" },
+  { country: "Turkmenistan / Afghanistan", pct: 15, km3: 9.6, fill: "#f3a847" },
+];
+const stressRadar = [
+  { metric: "Available", Tajikistan: 95, Uzbekistan: 30, Kazakhstan: 40, Turkmenistan: 20 },
+  { metric: "Demand",    Tajikistan: 35, Uzbekistan: 90, Kazakhstan: 70, Turkmenistan: 85 },
+  { metric: "Stress",    Tajikistan: 39, Uzbekistan: 95, Kazakhstan: 75, Turkmenistan: 88 },
+  { metric: "Storage",   Tajikistan: 80, Uzbekistan: 45, Kazakhstan: 55, Turkmenistan: 30 },
+  { metric: "Quality",   Tajikistan: 72, Uzbekistan: 50, Kazakhstan: 60, Turkmenistan: 48 },
+];
+
+type TabKey = "glaciers" | "water" | "climate" | "hydro" | "regional";
+
+// --- Export helpers ---
+function downloadCSV(filename: string, rows: Record<string, unknown>[]) {
+  if (!rows.length) return;
+  const headers = Object.keys(rows[0]);
+  const csv = [
+    headers.join(","),
+    ...rows.map((r) => headers.map((h) => JSON.stringify(r[h] ?? "")).join(",")),
+  ].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+async function downloadPNG(node: HTMLElement | null, filename: string) {
+  if (!node) return;
+  try {
+    const dataUrl = await toPng(node, { backgroundColor: "#ffffff", pixelRatio: 2 });
+    const a = document.createElement("a");
+    a.href = dataUrl; a.download = filename; a.click();
+  } catch (e) { console.error(e); }
+}
+function shareLink(title: string) {
+  const url = typeof window !== "undefined" ? window.location.href : "";
+  if (typeof navigator !== "undefined" && navigator.share) {
+    navigator.share({ title, url }).catch(() => {});
+  } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+    navigator.clipboard.writeText(url);
+  }
+}
 
 function Card({
   title, subtitle, children, delay = 0,
-  confidence, source, updated, insight,
+  confidence, source, updated, insight, csvData, csvName,
 }: {
   title: string; subtitle?: string; children: ReactNode; delay?: number;
   confidence: Confidence; source: string; updated: string; insight: string;
+  csvData?: Record<string, unknown>[]; csvName?: string;
 }) {
+  const chartRef = useRef<HTMLDivElement>(null);
+  const slug = (csvName || title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
       className="panel p-4 flex flex-col"
     >
-      <div className="mb-3">
-        <div className="text-[13px] font-semibold text-foreground">{title}</div>
-        {subtitle && <div className="text-[11px] text-muted-foreground">{subtitle}</div>}
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[13px] font-semibold text-foreground">{title}</div>
+          {subtitle && <div className="text-[11px] text-muted-foreground">{subtitle}</div>}
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={() => downloadPNG(chartRef.current, `${slug}.png`)}
+            title="Export PNG"
+            className="h-7 w-7 grid place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition"
+          ><ImageIcon size={13} /></button>
+          {csvData && (
+            <button
+              onClick={() => downloadCSV(`${slug}.csv`, csvData)}
+              title="Export CSV"
+              className="h-7 w-7 grid place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition"
+            ><FileCsv size={13} /></button>
+          )}
+          <button
+            onClick={() => shareLink(title)}
+            title="Share"
+            className="h-7 w-7 grid place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition"
+          ><Share size={13} /></button>
+        </div>
       </div>
-      <div className="h-[240px]">{children}</div>
+      <div ref={chartRef} className="h-[260px]">{children}</div>
       <ConfidenceBadge level={confidence} source={source} updated={updated} />
       <AIInsight text={insight} />
     </motion.div>
