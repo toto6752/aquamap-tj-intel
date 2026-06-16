@@ -13,9 +13,9 @@ const icons = {
   pop: { Icon: UsersThree, color: "text-warning", bg: "bg-warning/10" },
 } as const;
 
-function Counter({ value, decimals = 0 }: { value: number; decimals?: number }) {
+function Counter({ value, decimals = 0, locale = "en-US" }: { value: number; decimals?: number; locale?: string }) {
   const format = (n: number) =>
-    n.toLocaleString("en-US", { maximumFractionDigits: decimals, minimumFractionDigits: decimals });
+    n.toLocaleString(locale, { maximumFractionDigits: decimals, minimumFractionDigits: decimals });
   const [display, setDisplay] = useState(format(value));
   const mv = useMotionValue(value);
   const rounded = useTransform(mv, (l) => format(l));
@@ -26,12 +26,13 @@ function Counter({ value, decimals = 0 }: { value: number; decimals?: number }) 
     const ctl = animate(mv, value, { duration: 1.4, ease: "easeOut" });
     return () => { ctl.stop(); unsub(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, decimals]);
+  }, [value, decimals, locale]);
   return <span>{display}</span>;
 }
 
 export function StatsCards() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const locale = lang === "ru" ? "ru-RU" : lang === "tj" ? "ru-RU" : "en-US";
   const navigate = useNavigate();
   return (
     <div className="space-y-2">
@@ -41,7 +42,8 @@ export function StatsCards() {
         const TrendIcon = s.trend === "up" ? ArrowUp : s.trend === "down" ? ArrowDown : Minus;
         const trendColor =
           s.trend === "up" ? "text-success" : s.trend === "down" ? "text-destructive" : "text-muted-foreground";
-        const detail = (s as { detail?: string }).detail;
+        const detailKey = (s as { detailKey?: string }).detailKey;
+        const detail = detailKey ? t(detailKey) : (s as { detail?: string }).detail;
         const route = (s as { route?: string }).route;
         return (
           <motion.div
@@ -65,7 +67,7 @@ export function StatsCards() {
             </div>
             <div className="text-[11px] font-medium text-muted-foreground">{t((s as { labelKey: string }).labelKey)}</div>
             <div className="text-[26px] font-bold text-foreground tracking-tight leading-tight mt-0.5">
-              <Counter value={s.value} decimals={(s as { decimals?: number }).decimals ?? 0} />
+              <Counter value={s.value} decimals={(s as { decimals?: number }).decimals ?? 0} locale={locale} />
               <span className="text-[15px] font-semibold text-muted-foreground">{s.suffix}</span>
             </div>
             {detail && (
@@ -86,7 +88,7 @@ export function StatsCards() {
         </div>
         <div className="flex items-center gap-1 text-muted-foreground/80">
           <Clock size={11} weight="duotone" />
-          <span>Last updated: June 5, 2025 · 14:32 UTC+5</span>
+          <span>{t("stats.updated")}</span>
         </div>
       </div>
     </div>

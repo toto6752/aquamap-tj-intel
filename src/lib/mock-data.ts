@@ -129,7 +129,7 @@ export const stats = [
     trend: "up" as const,
     decimals: 1,
     source: "World Bank 2024",
-    detail: "Population with safe drinking water access",
+    detailKey: "stats.water.detail",
     route: "/analytics",
   },
   {
@@ -140,7 +140,7 @@ export const stats = [
     delta: "-1.1%/yr",
     trend: "down" as const,
     source: "RGI 7.0 / TajNCID",
-    detail: "From 15,240 km² (1990) → 13,542 km² (2025)",
+    detailKey: "stats.glacier.detail",
     route: "/analytics",
   },
   {
@@ -151,7 +151,7 @@ export const stats = [
     delta: "↑ increasing",
     trend: "down" as const,
     source: "UNEP 2025",
-    detail: "7 districts face extreme drought risk (GBAO, Badakhshan)",
+    detailKey: "stats.risk.detail",
     route: "/analytics",
   },
   {
@@ -163,7 +163,7 @@ export const stats = [
     trend: "up" as const,
     decimals: 1,
     source: "MEWR Tajikistan",
-    detail: "Current 4.6 GW · Rogun 3.6 GW · Total 8.3 GW by 2032",
+    detailKey: "stats.hydro.detail",
     route: "/analytics",
   },
   {
@@ -175,7 +175,7 @@ export const stats = [
     trend: "up" as const,
     decimals: 2,
     source: "World Bank 2024",
-    detail: "Urban 27.4% · Rural 72.6%",
+    detailKey: "stats.pop.detail",
     route: "/analytics",
   },
 ];
