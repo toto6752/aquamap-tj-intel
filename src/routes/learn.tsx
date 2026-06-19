@@ -9,6 +9,7 @@ import {
 } from "@phosphor-icons/react";
 import { useI18n } from "@/lib/i18n";
 import { regions } from "@/lib/mock-data";
+import { getExtraTabs, getWaterTypes, type ExtraTab } from "@/lib/learn-extras";
 
 export const Route = createFileRoute("/learn")({
   head: () => ({
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/learn")({
   component: LearnPage,
 });
 
-type TabKey = "water" | "glaciers" | "hydro" | "climate" | "regional" | "research";
+type TabKey = "water" | "glaciers" | "hydro" | "climate" | "regional" | "research" | "policy" | "intl" | "refs";
 
 interface Stat { v: string; l: string; }
 interface Section { h: string; body: string; }
@@ -325,9 +326,15 @@ function CompareRow({ label, rows, value }: { label: string; rows: typeof region
 }
 
 function LearnPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [active, setActive] = useState<TabKey>("water");
-  const current = tabs.find((tb) => tb.key === active)!;
+  const extraTabs: ExtraTab[] = getExtraTabs(lang);
+  const allTabs: TabContent[] = [
+    ...tabs,
+    ...extraTabs.map((e) => ({ ...e, key: e.key as TabKey })),
+  ];
+  const current = allTabs.find((tb) => tb.key === active) ?? allTabs[0];
+  const waterTypes = getWaterTypes(lang);
 
   return (
     <AppShell showSidebars={false}>
@@ -345,7 +352,7 @@ function LearnPage() {
 
         {/* Tab bar */}
         <div className="panel p-1.5 mb-4 flex flex-wrap gap-1 overflow-x-auto">
-          {tabs.map((tb) => {
+          {allTabs.map((tb) => {
             const on = tb.key === active;
             return (
               <button
@@ -459,9 +466,33 @@ function LearnPage() {
             {active === "regional" && <RegionalCompare />}
             {(active === "water" || active === "hydro" || active === "climate") && <HistoricalTimeline />}
 
+            {(active === "water" || active === "refs") && (
+              <div className="panel p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Drop size={16} weight="duotone" className="text-info" />
+                  <div>
+                    <h3 className="text-[14px] font-bold text-foreground">{t("learn.waterTypes.title")}</h3>
+                    <p className="text-[11.5px] text-muted-foreground">{t("learn.waterTypes.sub")}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  {waterTypes.map((w) => (
+                    <div key={w.key} className={`rounded-xl p-3 border border-border/40 ${w.bg}`}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg leading-none">{w.emoji}</span>
+                        <w.Icon size={16} weight="duotone" className={w.color} />
+                        <span className="text-[13px] font-bold text-foreground">{w.name}</span>
+                      </div>
+                      <p className="text-[11.5px] text-muted-foreground leading-snug mt-1.5">{w.def}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {current.links && current.links.length > 0 && (
               <div className="panel p-4">
-                <h3 className="font-semibold text-[13px] text-foreground mb-2">External resources</h3>
+                <h3 className="font-semibold text-[13px] text-foreground mb-2">{t("learn.external")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {current.links.map((l) => (
                     <a
