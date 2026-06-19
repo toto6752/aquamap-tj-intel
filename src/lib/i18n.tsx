@@ -226,6 +226,12 @@ const en: Dict = {
   "learn.tab.climate": "Climate & Risk",
   "learn.tab.regional": "Regional Impact",
   "learn.tab.research": "Research & Data",
+  "learn.tab.policy": "Policy & Programs",
+  "learn.tab.intl": "International",
+  "learn.tab.refs": "Sources & References",
+  "learn.waterTypes.title": "Water Types Legend",
+  "learn.waterTypes.sub": "Categories of water resources used throughout AquaMap TJ",
+  "learn.external": "Official resources",
 
   // Errors
   "err.title": "This page didn't load",
@@ -431,6 +437,12 @@ const ru: Dict = {
   "learn.tab.climate": "Климат и риски",
   "learn.tab.regional": "Региональное влияние",
   "learn.tab.research": "Данные и наука",
+  "learn.tab.policy": "Политика и программы",
+  "learn.tab.intl": "Международное",
+  "learn.tab.refs": "Источники и литература",
+  "learn.waterTypes.title": "Легенда типов воды",
+  "learn.waterTypes.sub": "Категории водных ресурсов, используемые в AquaMap TJ",
+  "learn.external": "Официальные ресурсы",
 
   "err.title": "Страница не загрузилась",
   "err.body": "Произошла ошибка. Попробуйте обновить или вернуться на главную.",
@@ -635,6 +647,12 @@ const tj: Dict = {
   "learn.tab.climate": "Иқлим ва хатар",
   "learn.tab.regional": "Таъсири минтақавӣ",
   "learn.tab.research": "Тадқиқот ва маълумот",
+  "learn.tab.policy": "Сиёсат ва барномаҳо",
+  "learn.tab.intl": "Байналмилалӣ",
+  "learn.tab.refs": "Манбаъ ва адабиёт",
+  "learn.waterTypes.title": "Легенди намудҳои об",
+  "learn.waterTypes.sub": "Намудҳои захираҳои об дар AquaMap TJ",
+  "learn.external": "Манбаъҳои расмӣ",
 
   "err.title": "Саҳифа бор нашуд",
   "err.body": "Хатогӣ рух дод. Лутфан аз нав кӯшиш кунед.",
