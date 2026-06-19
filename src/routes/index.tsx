@@ -4,6 +4,7 @@ import { MapClient } from "@/components/map/MapClient";
 import { MapLegend } from "@/components/map/MapLegend";
 import { BasemapSwitcher } from "@/components/map/BasemapSwitcher";
 import { MapTools } from "@/components/map/MapTools";
+import { WaterTypesLegend } from "@/components/map/WaterTypesLegend";
 import { StatsCards } from "@/components/stats/StatsCards";
 
 export const Route = createFileRoute("/")({
@@ -27,6 +28,7 @@ function Index() {
           <div className="absolute top-3 left-3 z-[400] flex flex-col gap-2">
             <BasemapSwitcher />
             <div className="relative"><MapTools /></div>
+            <WaterTypesLegend />
           </div>
           <div className="absolute bottom-3 left-3 z-[400]">
             <MapLegend />
