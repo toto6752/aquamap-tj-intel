@@ -636,6 +636,85 @@ function StressRadarChart() { return (
   </ResponsiveContainer>
 ); }
 
+// --- Resources & Use charts ---
+function SurfaceGroundChart({ lang }: { lang: Lang }) {
+  const L = RESOURCE_L[lang];
+  const data = [
+    {
+      name: "TJ",
+      [L.rivers]: 35, [L.lakes]: 2, [L.glaciers]: 11,
+      [L.artesian]: 8, [L.springs]: 4, [L.aquifers]: 4,
+    },
+  ];
+  return (
+    <ResponsiveContainer>
+      <BarChart data={data} layout="vertical" margin={{ left: 10, right: 30 }}>
+        <CartesianGrid stroke="#eef2f7" horizontal={false} />
+        <XAxis type="number" {...axis} unit=" km³" />
+        <YAxis type="category" dataKey="name" {...axis} width={40} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [`${v} km³/yr`, n]} />
+        <Legend wrapperStyle={{ fontSize: 11 }} />
+        <Bar dataKey={L.rivers} stackId="a" fill="#0066CC" />
+        <Bar dataKey={L.lakes} stackId="a" fill="#2a8fe0" />
+        <Bar dataKey={L.glaciers} stackId="a" fill="#7fb8d8" />
+        <Bar dataKey={L.artesian} stackId="a" fill="#00CCFF" />
+        <Bar dataKey={L.springs} stackId="a" fill="#5fddff" />
+        <Bar dataKey={L.aquifers} stackId="a" fill="#a0ebff" />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+function SectorPieChart({ lang }: { lang: Lang }) {
+  const L = SECTOR_L[lang];
+  const data = sectorUse.map((s, i) => ({ name: L[s.key], value: s.v, pct: s.pct, color: sectorColors[i] }));
+  return (
+    <ResponsiveContainer>
+      <PieChart>
+        <Pie data={data} dataKey="value" innerRadius={45} outerRadius={90} paddingAngle={2}>
+          {data.map((d) => <Cell key={d.name} fill={d.color} />)}
+        </Pie>
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, _n, p) => [`${v} km³/yr · ${p.payload.pct}%`, p.payload.name]} />
+        <Legend wrapperStyle={{ fontSize: 11 }} />
+      </PieChart>
+    </ResponsiveContainer>
+  );
+}
+
+function RegionalAgChart({ lang }: { lang: Lang }) {
+  const L = SECTOR_L[lang];
+  const data = regionalAgUse.map((r) => ({ name: L[r.key], v: r.v, pct: r.pct }));
+  return (
+    <ResponsiveContainer>
+      <BarChart data={data} layout="vertical" margin={{ left: 20 }}>
+        <CartesianGrid stroke="#eef2f7" horizontal={false} />
+        <XAxis type="number" {...axis} unit=" km³" />
+        <YAxis type="category" dataKey="name" {...axis} width={110} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, _n, p) => [`${v} km³/yr · ${p.payload.pct}%`, "Use"]} />
+        <Bar dataKey="v" fill="#90EE90" radius={[0, 6, 6, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+function BasinsResourcesChart({ lang }: { lang: Lang }) {
+  const L = BASIN_L[lang];
+  const data = basinsResources.map((b, i) => ({ name: L[b.key], v: b.v, pct: b.pct, fill: basinColors[i] }));
+  return (
+    <ResponsiveContainer>
+      <BarChart data={data} layout="vertical" margin={{ left: 20 }}>
+        <CartesianGrid stroke="#eef2f7" horizontal={false} />
+        <XAxis type="number" {...axis} unit=" km³" />
+        <YAxis type="category" dataKey="name" {...axis} width={100} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, _n, p) => [`${v} km³/yr · ${p.payload.pct}%`, "Resource"]} />
+        <Bar dataKey="v" radius={[0, 6, 6, 0]}>
+          {data.map((d) => <Cell key={d.name} fill={d.fill} />)}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
 function RegionalTable() {
   const { t } = useI18n();
   const riskLabel = { high: t("risk.high"), moderate: t("risk.moderate"), low: t("risk.low") };
