@@ -762,12 +762,13 @@ function RegionalTable() {
 }
 
 function AnalyticsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [tab, setTab] = useState<TabKey>("glaciers");
 
   const tabs: { key: TabKey; label: string; Icon: typeof Drop }[] = [
     { key: "glaciers", label: "Glacier Monitoring", Icon: Snowflake },
     { key: "water", label: "Water Resources", Icon: Drop },
+    { key: "use", label: t("an.tab.use"), Icon: Faders },
     { key: "climate", label: "Climate Risk & Change", Icon: CloudRain },
     { key: "hydro", label: "Hydropower & Energy", Icon: Lightning },
     { key: "regional", label: "Regional & Transboundary", Icon: Globe },
@@ -907,6 +908,26 @@ function AnalyticsPage() {
                     csvData={stressRadar} csvName="stress-radar"><StressRadarChart /></Card>
                 </div>
                 <RegionalTable />
+              </div>
+            )}
+            {tab === "use" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <Card title={RESOURCE_L[lang].title} subtitle={RESOURCE_L[lang].sub}
+                  confidence="verified" source="FAO AQUASTAT · MEWR Tajikistan" updated="2024"
+                  insight={RESOURCE_L[lang].insight}
+                  csvData={resourcesByType} csvName="surface-vs-groundwater"><SurfaceGroundChart lang={lang} /></Card>
+                <Card title={SECTOR_L[lang].title} subtitle={SECTOR_L[lang].sub}
+                  confidence="verified" source="FAO AQUASTAT · World Bank 2024" updated="2024"
+                  insight={SECTOR_L[lang].insight}
+                  csvData={sectorUse} csvName="water-use-by-sector"><SectorPieChart lang={lang} /></Card>
+                <Card title={SECTOR_L[lang].regionTitle} subtitle={SECTOR_L[lang].regionSub}
+                  confidence="estimated" source="MEWR Tajikistan · ADB" updated="2024"
+                  insight={SECTOR_L[lang].regionInsight}
+                  csvData={regionalAgUse} csvName="agricultural-water-by-region"><RegionalAgChart lang={lang} /></Card>
+                <Card title={BASIN_L[lang].title} subtitle={BASIN_L[lang].sub}
+                  confidence="verified" source="FAO AQUASTAT" updated="2024"
+                  insight={BASIN_L[lang].insight}
+                  csvData={basinsResources} csvName="resources-by-basin"><BasinsResourcesChart lang={lang} /></Card>
               </div>
             )}
           </motion.div>
