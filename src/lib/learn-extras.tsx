@@ -1,5 +1,5 @@
 import {
-  Scroll, Books, Globe, Drop, Waves, Snowflake, Bank, Cube,
+  Scroll, Books, Globe, Drop, Waves, Snowflake, Bank, Cube, MapTrifold,
 } from "@phosphor-icons/react";
 import type { Lang } from "./i18n";
 
@@ -9,7 +9,7 @@ export interface ExtraLink { label: string; href: string; }
 export interface ExtraFact { text: string; source: string; href: string; }
 
 export interface ExtraTab {
-  key: "policy" | "intl" | "refs";
+  key: "policy" | "intl" | "refs" | "basins";
   emoji: string;
   tKey: string;
   Icon: typeof Drop;
@@ -285,8 +285,80 @@ const refs: Record<Lang, ExtraTab> = {
 };
 
 export function getExtraTabs(lang: Lang): ExtraTab[] {
-  return [policy[lang], intl[lang], refs[lang]];
+  return [basins[lang], policy[lang], intl[lang], refs[lang]];
 }
+
+const basins: Record<Lang, ExtraTab> = {
+  en: {
+    key: "basins", emoji: "🗺️", tKey: "learn.tab.basins", Icon: MapTrifold,
+    color: "text-river", bg: "bg-river/10",
+    title: "Water Basins of Tajikistan",
+    intro: "Tajikistan has 4 major water basins, each with unique hydrology, transboundary relationships and climate vulnerability.",
+    highlights: [
+      { v: "40 km³", l: "Amu Darya (62.5%)" },
+      { v: "13 km³", l: "Syr Darya (20.3%)" },
+      { v: "10.5 km³", l: "Zeravshan (16.4%)" },
+      { v: "40M+", l: "downstream people served" },
+    ],
+    sections: [
+      { h: "Amu Darya Basin — 40 km³/yr (62.5%)", body: "Western Tajikistan. Formed by the Panj and Vakhsh rivers. Supplies Uzbekistan, Turkmenistan and Afghanistan (40M+ people). Challenge: winter water deficit. Provides ~55% of total Aral Sea basin water." },
+      { h: "Syr Darya Basin — 13 km³/yr (20.3%)", body: "Northern Tajikistan. Shared with Kyrgyzstan and Uzbekistan. Key challenge: transboundary management and equitable seasonal allocation." },
+      { h: "Zeravshan Basin — 10.5 km³/yr (16.4%)", body: "Central-western Tajikistan. A significant portion flows into Uzbekistan. Recurring dry-season deficits in lower reaches." },
+      { h: "Other Basins — 0.5 km³/yr (0.8%)", body: "Various smaller tributaries draining to internal valleys or neighbouring catchments." },
+      { h: "Special note — GBAO", body: "Gorno-Badakhshan (GBAO) faces unique challenges: limited arable land, deep river valleys that restrict access, very high dependence on glacier melt, and an outsized role in downstream water security." },
+    ],
+    facts: [
+      { text: "Amu Darya basin generates 62.5% of national runoff and ~55% of Aral Sea basin water.", source: "FAO AQUASTAT", href: "https://www.fao.org/aquastat/" },
+      { text: "GBAO depends almost entirely on glacier melt for seasonal flow.", source: "UNEP Atlas 2025", href: "https://www.unep.org/" },
+    ],
+  },
+  ru: {
+    key: "basins", emoji: "🗺️", tKey: "learn.tab.basins", Icon: MapTrifold,
+    color: "text-river", bg: "bg-river/10",
+    title: "Водные бассейны Таджикистана",
+    intro: "В Таджикистане 4 основных водных бассейна, каждый — с уникальной гидрологией, трансграничной ролью и климатической уязвимостью.",
+    highlights: [
+      { v: "40 км³", l: "Амударья (62,5%)" },
+      { v: "13 км³", l: "Сырдарья (20,3%)" },
+      { v: "10,5 км³", l: "Зеравшан (16,4%)" },
+      { v: "40+ млн", l: "пользователей ниже по течению" },
+    ],
+    sections: [
+      { h: "Бассейн Амударьи — 40 км³/год (62,5%)", body: "Запад Таджикистана. Образуется реками Пяндж и Вахш. Снабжает Узбекистан, Туркменистан и Афганистан (40+ млн человек). Проблема: зимний дефицит воды. Даёт около 55% всей воды бассейна Аральского моря." },
+      { h: "Бассейн Сырдарьи — 13 км³/год (20,3%)", body: "Север Таджикистана. Общий с Кыргызстаном и Узбекистаном. Ключевой вызов: трансграничное управление и сезонное распределение." },
+      { h: "Бассейн Зеравшана — 10,5 км³/год (16,4%)", body: "Центрально-западный Таджикистан. Значительная часть стока уходит в Узбекистан. Регулярный сухосезонный дефицит." },
+      { h: "Другие бассейны — 0,5 км³/год (0,8%)", body: "Малые притоки, дренирующие внутренние долины или соседние водосборы." },
+      { h: "Особая заметка — ГБАО", body: "Горно-Бадахшанская область (ГБАО) сталкивается с уникальными вызовами: дефицит земель, глубокие речные долины, ограничивающие доступ, высокая зависимость от ледникового стока, важная роль в водной безопасности ниже по течению." },
+    ],
+    facts: [
+      { text: "Бассейн Амударьи даёт 62,5% национального стока и ~55% воды бассейна Аральского моря.", source: "FAO AQUASTAT", href: "https://www.fao.org/aquastat/" },
+      { text: "ГБАО практически полностью зависит от таяния ледников.", source: "UNEP Atlas 2025", href: "https://www.unep.org/" },
+    ],
+  },
+  tj: {
+    key: "basins", emoji: "🗺️", tKey: "learn.tab.basins", Icon: MapTrifold,
+    color: "text-river", bg: "bg-river/10",
+    title: "Ҳавзаҳои оби Тоҷикистон",
+    intro: "Тоҷикистон 4 ҳавзаи асосии об дорад, ҳар яке бо гидрологияи беназир, нақши трансмарзӣ ва осебпазирии иқлимӣ.",
+    highlights: [
+      { v: "40 км³", l: "Амударё (62,5%)" },
+      { v: "13 км³", l: "Сирдарё (20,3%)" },
+      { v: "10,5 км³", l: "Зарафшон (16,4%)" },
+      { v: "40+ млн", l: "истеъмолкунандагони поёноб" },
+    ],
+    sections: [
+      { h: "Ҳавзаи Амударё — 40 км³/сол (62,5%)", body: "Ғарби Тоҷикистон. Аз Панҷ ва Вахш ташкил мешавад. Ӯзбекистон, Туркманистон ва Афғонистонро (40+ млн нафар) таъмин мекунад. Мушкилӣ: камобии зимистон. Тақрибан 55% оби ҳавзаи Арал." },
+      { h: "Ҳавзаи Сирдарё — 13 км³/сол (20,3%)", body: "Шимоли Тоҷикистон. Бо Қирғизистон ва Ӯзбекистон муштарак. Чолиш: идоракунии трансмарзӣ ва тақсими мавсимӣ." },
+      { h: "Ҳавзаи Зарафшон — 10,5 км³/сол (16,4%)", body: "Қисми марказӣ-ғарбӣ. Қисми зиёди ҷараён ба Ӯзбекистон меравад. Камобии мавсимии хушк." },
+      { h: "Дигар ҳавзаҳо — 0,5 км³/сол (0,8%)", body: "Шохобҳои хурд, ки ба водиҳои дохилӣ ё ҳавзаҳои ҳамсоя мерезанд." },
+      { h: "Қайди махсус — ГБАО", body: "Кӯҳистони Бадахшон (ГБАО) бо мушкилоти беназир: замини маҳдуд, водиҳои чуқури дарёӣ, вобастагии баланд ба обшавии пиряхҳо ва нақши муҳим дар амнияти обии поёноб." },
+    ],
+    facts: [
+      { text: "Ҳавзаи Амударё 62,5% ҷараёни миллӣ ва ~55% оби ҳавзаи Аралро таъмин мекунад.", source: "FAO AQUASTAT", href: "https://www.fao.org/aquastat/" },
+      { text: "ГБАО қариб пурра аз обшавии пиряхҳо вобаста аст.", source: "UNEP Atlas 2025", href: "https://www.unep.org/" },
+    ],
+  },
+};
 
 export interface WaterType {
   key: string;

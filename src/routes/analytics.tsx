@@ -11,7 +11,8 @@ import { toPng } from "html-to-image";
 import { useI18n } from "@/lib/i18n";
 import { ConfidenceBadge, AIInsight, Confidence } from "@/components/ui/confidence-badge";
 import { regions } from "@/lib/mock-data";
-import { Drop, Snowflake, CloudRain, Lightning, Globe, DownloadSimple, FileCsv, Image as ImageIcon, Share, FilePdf } from "@phosphor-icons/react";
+import { Drop, Snowflake, CloudRain, Lightning, Globe, DownloadSimple, FileCsv, Image as ImageIcon, Share, FilePdf, Faders } from "@phosphor-icons/react";
+import type { Lang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({
@@ -150,7 +151,121 @@ const stressRadar = [
   { metric: "Quality",   Tajikistan: 72, Uzbekistan: 50, Kazakhstan: 60, Turkmenistan: 48 },
 ];
 
-type TabKey = "glaciers" | "water" | "climate" | "hydro" | "regional";
+// --- Datasets for Resources & Use tab (GIZ feedback) ---
+const sectorColors = ["#90EE90", "#87CEEB", "#FFB6C1", "#FFD700", "#D3D3D3"];
+const basinColors = ["#0066CC", "#2f9c5b", "#FF8800", "#D3D3D3"];
+
+const resourcesByType = [
+  { src: "rivers", v: 35, parent: "surface" },
+  { src: "lakes", v: 2, parent: "surface" },
+  { src: "glaciers", v: 11, parent: "surface" },
+  { src: "artesian", v: 8, parent: "ground" },
+  { src: "springs", v: 4, parent: "ground" },
+  { src: "aquifers", v: 4, parent: "ground" },
+];
+const sectorUse = [
+  { key: "agriculture", v: 59.5, pct: 93 },
+  { key: "municipal", v: 2.2, pct: 3.5 },
+  { key: "industry", v: 1.3, pct: 2 },
+  { key: "energy", v: 0.8, pct: 1 },
+  { key: "other", v: 0.2, pct: 0.5 },
+];
+const regionalAgUse = [
+  { key: "khatlon", v: 32, pct: 54 },
+  { key: "sughd", v: 18, pct: 30 },
+  { key: "rasht", v: 6, pct: 10 },
+  { key: "gbao", v: 2, pct: 3 },
+  { key: "dushanbe", v: 1.5, pct: 2.5 },
+];
+const basinsResources = [
+  { key: "amu", v: 40, pct: 62.5 },
+  { key: "syr", v: 13, pct: 20.3 },
+  { key: "zer", v: 10.5, pct: 16.4 },
+  { key: "other", v: 0.5, pct: 0.8 },
+];
+
+const RESOURCE_L: Record<Lang, Record<string, string>> = {
+  en: {
+    surface: "Surface Water", ground: "Groundwater",
+    rivers: "Rivers", lakes: "Lakes", glaciers: "Glaciers",
+    artesian: "Artesian wells", springs: "Springs", aquifers: "Aquifers",
+    title: "Surface Water vs Groundwater",
+    sub: "Composition of 64 km³/year of renewable water resources",
+    insight: "Surface water (especially from glaciers) represents 75% of annual runoff, making glacier retreat a critical concern for long-term water security.",
+  },
+  ru: {
+    surface: "Поверхностные воды", ground: "Подземные воды",
+    rivers: "Реки", lakes: "Озёра", glaciers: "Ледники",
+    artesian: "Артезианские", springs: "Родники", aquifers: "Водоносные горизонты",
+    title: "Поверхностные и подземные воды",
+    sub: "Структура 64 км³/год возобновляемых водных ресурсов",
+    insight: "Поверхностные воды (особенно ледниковые) составляют 75% годового стока, что делает отступление ледников критической проблемой для водной безопасности.",
+  },
+  tj: {
+    surface: "Обҳои сатҳӣ", ground: "Обҳои зеризаминӣ",
+    rivers: "Дарёҳо", lakes: "Кӯлҳо", glaciers: "Пиряхҳо",
+    artesian: "Артезианӣ", springs: "Чашмаҳо", aquifers: "Уфуқҳои обдор",
+    title: "Обҳои сатҳӣ ва зеризаминӣ",
+    sub: "Сохтори 64 км³/сол захираҳои оби барқароршаванда",
+    insight: "Обҳои сатҳӣ (махсусан аз пиряхҳо) 75% ҷараёни солонаро ташкил медиҳанд — ақибнишинии пиряхҳо барои амнияти дарозмуддати об хатарнок аст.",
+  },
+};
+
+const SECTOR_L: Record<Lang, Record<string, string>> = {
+  en: {
+    title: "Water Use by Sector (Total: 64 km³/year)",
+    sub: "Annual consumption breakdown across major sectors",
+    insight: "Agriculture dominates water use (93%), particularly irrigation in Khatlon and Sughd regions. Water security depends on effective irrigation management.",
+    agriculture: "Agriculture", municipal: "Municipal & Household", industry: "Industry", energy: "Energy (Hydropower)", other: "Other Uses",
+    regionTitle: "Agricultural Water Use by Region",
+    regionSub: "Distribution of irrigation water across regions (km³/yr)",
+    regionInsight: "Khatlon and Sughd regions consume 85% of agricultural water, making them critical for food security but vulnerable to drought.",
+    khatlon: "Khatlon", sughd: "Sughd", rasht: "Rasht Valley", gbao: "GBAO", dushanbe: "Dushanbe & DRS",
+  },
+  ru: {
+    title: "Использование воды по секторам (Всего: 64 км³/год)",
+    sub: "Годовая структура потребления по основным секторам",
+    insight: "Сельское хозяйство доминирует в использовании воды (93%), особенно орошение в регионах Хатлон и Согд. Водная безопасность зависит от эффективного управления орошением.",
+    agriculture: "Сельское хозяйство", municipal: "ЖКХ", industry: "Промышленность", energy: "Энергетика", other: "Прочее",
+    regionTitle: "Использование воды в сельском хозяйстве по регионам",
+    regionSub: "Распределение оросительной воды по регионам (км³/год)",
+    regionInsight: "Регионы Хатлон и Согд потребляют 85% водных ресурсов сельского хозяйства, делая их критическими для продовольственной безопасности.",
+    khatlon: "Хатлон", sughd: "Согд", rasht: "Рашт", gbao: "ГБАО", dushanbe: "Душанбе и РРП",
+  },
+  tj: {
+    title: "Истеъмоли об аз рӯйи сектор (Ҷамъ: 64 км³/сол)",
+    sub: "Сохтори истеъмоли солона аз рӯйи секторҳои асосӣ",
+    insight: "Кишоварзӣ дар истеъмоли об бартарӣ дорад (93%), махсусан обёрӣ дар Хатлон ва Суғд. Амнияти об ба идоракунии самараноки обёрӣ вобаста аст.",
+    agriculture: "Кишоварзӣ", municipal: "Хадамоти коммуналӣ", industry: "Саноат", energy: "Энергетика", other: "Дигар",
+    regionTitle: "Истеъмоли оби кишоварзӣ аз рӯйи вилоят",
+    regionSub: "Тақсими оби обёрӣ дар вилоятҳо (км³/сол)",
+    regionInsight: "Хатлон ва Суғд 85% оби кишоварзиро истеъмол мекунанд — барои амнияти озуқа муҳим, вале ба хушксолӣ осебпазир.",
+    khatlon: "Хатлон", sughd: "Суғд", rasht: "Рашт", gbao: "ГБАО", dushanbe: "Душанбе ва НТҶ",
+  },
+};
+
+const BASIN_L: Record<Lang, Record<string, string>> = {
+  en: {
+    title: "Water Resources by Basin",
+    sub: "Annual renewable water resources by major basin (km³/yr)",
+    insight: "Amu Darya basin dominates, providing 62.5% of water resources. Water security in this basin is crucial for 40M+ downstream users.",
+    amu: "Amu Darya", syr: "Syr Darya", zer: "Zeravshan", other: "Other",
+  },
+  ru: {
+    title: "Водные ресурсы по бассейнам",
+    sub: "Возобновляемые водные ресурсы по основным бассейнам (км³/год)",
+    insight: "Бассейн Амударьи доминирует, обеспечивая 62,5% водных ресурсов. Водная безопасность в этом бассейне критична для 40+ млн пользователей.",
+    amu: "Амударья", syr: "Сырдарья", zer: "Зеравшан", other: "Прочие",
+  },
+  tj: {
+    title: "Захираҳои об аз рӯйи ҳавза",
+    sub: "Захираҳои оби барқароршаванда аз рӯйи ҳавзаҳои асосӣ (км³/сол)",
+    insight: "Ҳавзаи Амударё бартарӣ дорад ва 62,5% захираҳоро таъмин мекунад. Амнияти об дар ин ҳавза барои 40+ млн истеъмолкунандаи поёноб муҳим аст.",
+    amu: "Амударё", syr: "Сирдарё", zer: "Зарафшон", other: "Дигар",
+  },
+};
+
+type TabKey = "glaciers" | "water" | "climate" | "hydro" | "regional" | "use";
 
 // --- Export helpers ---
 function downloadCSV(filename: string, rows: Record<string, unknown>[]) {
@@ -519,6 +634,85 @@ function StressRadarChart() { return (
   </ResponsiveContainer>
 ); }
 
+// --- Resources & Use charts ---
+function SurfaceGroundChart({ lang }: { lang: Lang }) {
+  const L = RESOURCE_L[lang];
+  const data = [
+    {
+      name: "TJ",
+      [L.rivers]: 35, [L.lakes]: 2, [L.glaciers]: 11,
+      [L.artesian]: 8, [L.springs]: 4, [L.aquifers]: 4,
+    },
+  ];
+  return (
+    <ResponsiveContainer>
+      <BarChart data={data} layout="vertical" margin={{ left: 10, right: 30 }}>
+        <CartesianGrid stroke="#eef2f7" horizontal={false} />
+        <XAxis type="number" {...axis} unit=" km³" />
+        <YAxis type="category" dataKey="name" {...axis} width={40} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, n: string) => [`${v} km³/yr`, n]} />
+        <Legend wrapperStyle={{ fontSize: 11 }} />
+        <Bar dataKey={L.rivers} stackId="a" fill="#0066CC" />
+        <Bar dataKey={L.lakes} stackId="a" fill="#2a8fe0" />
+        <Bar dataKey={L.glaciers} stackId="a" fill="#7fb8d8" />
+        <Bar dataKey={L.artesian} stackId="a" fill="#00CCFF" />
+        <Bar dataKey={L.springs} stackId="a" fill="#5fddff" />
+        <Bar dataKey={L.aquifers} stackId="a" fill="#a0ebff" />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+function SectorPieChart({ lang }: { lang: Lang }) {
+  const L = SECTOR_L[lang];
+  const data = sectorUse.map((s, i) => ({ name: L[s.key], value: s.v, pct: s.pct, color: sectorColors[i] }));
+  return (
+    <ResponsiveContainer>
+      <PieChart>
+        <Pie data={data} dataKey="value" innerRadius={45} outerRadius={90} paddingAngle={2}>
+          {data.map((d) => <Cell key={d.name} fill={d.color} />)}
+        </Pie>
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, _n, p) => [`${v} km³/yr · ${p.payload.pct}%`, p.payload.name]} />
+        <Legend wrapperStyle={{ fontSize: 11 }} />
+      </PieChart>
+    </ResponsiveContainer>
+  );
+}
+
+function RegionalAgChart({ lang }: { lang: Lang }) {
+  const L = SECTOR_L[lang];
+  const data = regionalAgUse.map((r) => ({ name: L[r.key], v: r.v, pct: r.pct }));
+  return (
+    <ResponsiveContainer>
+      <BarChart data={data} layout="vertical" margin={{ left: 20 }}>
+        <CartesianGrid stroke="#eef2f7" horizontal={false} />
+        <XAxis type="number" {...axis} unit=" km³" />
+        <YAxis type="category" dataKey="name" {...axis} width={110} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, _n, p) => [`${v} km³/yr · ${p.payload.pct}%`, "Use"]} />
+        <Bar dataKey="v" fill="#90EE90" radius={[0, 6, 6, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+function BasinsResourcesChart({ lang }: { lang: Lang }) {
+  const L = BASIN_L[lang];
+  const data = basinsResources.map((b, i) => ({ name: L[b.key], v: b.v, pct: b.pct, fill: basinColors[i] }));
+  return (
+    <ResponsiveContainer>
+      <BarChart data={data} layout="vertical" margin={{ left: 20 }}>
+        <CartesianGrid stroke="#eef2f7" horizontal={false} />
+        <XAxis type="number" {...axis} unit=" km³" />
+        <YAxis type="category" dataKey="name" {...axis} width={100} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, _n, p) => [`${v} km³/yr · ${p.payload.pct}%`, "Resource"]} />
+        <Bar dataKey="v" radius={[0, 6, 6, 0]}>
+          {data.map((d) => <Cell key={d.name} fill={d.fill} />)}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
 function RegionalTable() {
   const { t } = useI18n();
   const riskLabel = { high: t("risk.high"), moderate: t("risk.moderate"), low: t("risk.low") };
@@ -566,12 +760,13 @@ function RegionalTable() {
 }
 
 function AnalyticsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [tab, setTab] = useState<TabKey>("glaciers");
 
   const tabs: { key: TabKey; label: string; Icon: typeof Drop }[] = [
     { key: "glaciers", label: "Glacier Monitoring", Icon: Snowflake },
     { key: "water", label: "Water Resources", Icon: Drop },
+    { key: "use", label: t("an.tab.use"), Icon: Faders },
     { key: "climate", label: "Climate Risk & Change", Icon: CloudRain },
     { key: "hydro", label: "Hydropower & Energy", Icon: Lightning },
     { key: "regional", label: "Regional & Transboundary", Icon: Globe },
@@ -711,6 +906,26 @@ function AnalyticsPage() {
                     csvData={stressRadar} csvName="stress-radar"><StressRadarChart /></Card>
                 </div>
                 <RegionalTable />
+              </div>
+            )}
+            {tab === "use" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <Card title={RESOURCE_L[lang].title} subtitle={RESOURCE_L[lang].sub}
+                  confidence="verified" source="FAO AQUASTAT · MEWR Tajikistan" updated="2024"
+                  insight={RESOURCE_L[lang].insight}
+                  csvData={resourcesByType} csvName="surface-vs-groundwater"><SurfaceGroundChart lang={lang} /></Card>
+                <Card title={SECTOR_L[lang].title} subtitle={SECTOR_L[lang].sub}
+                  confidence="verified" source="FAO AQUASTAT · World Bank 2024" updated="2024"
+                  insight={SECTOR_L[lang].insight}
+                  csvData={sectorUse} csvName="water-use-by-sector"><SectorPieChart lang={lang} /></Card>
+                <Card title={SECTOR_L[lang].regionTitle} subtitle={SECTOR_L[lang].regionSub}
+                  confidence="estimated" source="MEWR Tajikistan · ADB" updated="2024"
+                  insight={SECTOR_L[lang].regionInsight}
+                  csvData={regionalAgUse} csvName="agricultural-water-by-region"><RegionalAgChart lang={lang} /></Card>
+                <Card title={BASIN_L[lang].title} subtitle={BASIN_L[lang].sub}
+                  confidence="verified" source="FAO AQUASTAT" updated="2024"
+                  insight={BASIN_L[lang].insight}
+                  csvData={basinsResources} csvName="resources-by-basin"><BasinsResourcesChart lang={lang} /></Card>
               </div>
             )}
           </motion.div>
