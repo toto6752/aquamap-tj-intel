@@ -152,8 +152,6 @@ const stressRadar = [
 ];
 
 // --- Datasets for Resources & Use tab (GIZ feedback) ---
-const SURFACE_COLOR = "#0066CC";
-const GROUND_COLOR = "#00CCFF";
 const sectorColors = ["#90EE90", "#87CEEB", "#FFB6C1", "#FFD700", "#D3D3D3"];
 const basinColors = ["#0066CC", "#2f9c5b", "#FF8800", "#D3D3D3"];
 
