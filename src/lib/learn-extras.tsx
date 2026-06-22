@@ -1,5 +1,5 @@
 import {
-  Scroll, Books, Globe, Drop, Waves, Snowflake, Bank, Cube,
+  Scroll, Books, Globe, Drop, Waves, Snowflake, Bank, Cube, MapTrifold,
 } from "@phosphor-icons/react";
 import type { Lang } from "./i18n";
 
@@ -9,7 +9,7 @@ export interface ExtraLink { label: string; href: string; }
 export interface ExtraFact { text: string; source: string; href: string; }
 
 export interface ExtraTab {
-  key: "policy" | "intl" | "refs";
+  key: "policy" | "intl" | "refs" | "basins";
   emoji: string;
   tKey: string;
   Icon: typeof Drop;
@@ -285,7 +285,7 @@ const refs: Record<Lang, ExtraTab> = {
 };
 
 export function getExtraTabs(lang: Lang): ExtraTab[] {
-  return [policy[lang], intl[lang], refs[lang]];
+  return [basins[lang], policy[lang], intl[lang], refs[lang]];
 }
 
 export interface WaterType {
