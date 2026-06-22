@@ -21,7 +21,7 @@ export const Route = createFileRoute("/learn")({
   component: LearnPage,
 });
 
-type TabKey = "water" | "glaciers" | "hydro" | "climate" | "regional" | "research" | "policy" | "intl" | "refs";
+type TabKey = "water" | "glaciers" | "hydro" | "climate" | "regional" | "research" | "policy" | "intl" | "refs" | "basins";
 
 interface Stat { v: string; l: string; }
 interface Section { h: string; body: string; }
@@ -465,6 +465,18 @@ function LearnPage() {
 
             {active === "regional" && <RegionalCompare />}
             {(active === "water" || active === "hydro" || active === "climate") && <HistoricalTimeline />}
+
+            {active === "water" && (
+              <div className="panel p-4 border-l-4 border-l-info bg-info/5">
+                <div className="flex items-start gap-3">
+                  <Drop size={20} weight="duotone" className="text-info mt-0.5 shrink-0" />
+                  <div>
+                    <div className="text-[13px] font-bold text-foreground">{t("learn.rivers.note.title")}</div>
+                    <p className="text-[12.5px] text-muted-foreground leading-relaxed mt-1">{t("learn.rivers.note.body")}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {(active === "water" || active === "refs") && (
               <div className="panel p-5">
