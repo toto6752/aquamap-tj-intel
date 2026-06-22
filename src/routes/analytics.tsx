@@ -11,7 +11,8 @@ import { toPng } from "html-to-image";
 import { useI18n } from "@/lib/i18n";
 import { ConfidenceBadge, AIInsight, Confidence } from "@/components/ui/confidence-badge";
 import { regions } from "@/lib/mock-data";
-import { Drop, Snowflake, CloudRain, Lightning, Globe, DownloadSimple, FileCsv, Image as ImageIcon, Share, FilePdf } from "@phosphor-icons/react";
+import { Drop, Snowflake, CloudRain, Lightning, Globe, DownloadSimple, FileCsv, Image as ImageIcon, Share, FilePdf, Faders } from "@phosphor-icons/react";
+import type { Lang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({
@@ -150,7 +151,7 @@ const stressRadar = [
   { metric: "Quality",   Tajikistan: 72, Uzbekistan: 50, Kazakhstan: 60, Turkmenistan: 48 },
 ];
 
-type TabKey = "glaciers" | "water" | "climate" | "hydro" | "regional";
+type TabKey = "glaciers" | "water" | "climate" | "hydro" | "regional" | "use";
 
 // --- Export helpers ---
 function downloadCSV(filename: string, rows: Record<string, unknown>[]) {
