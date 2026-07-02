@@ -14,6 +14,8 @@ export type LayerKey =
 export type LayerState = Record<LayerKey, boolean>;
 export type LayerOpacity = Record<LayerKey, number>; // 0..100
 export type Basemap = "light" | "terrain" | "satellite" | "hybrid" | "dark";
+export type MapViewMode = "districts" | "basins";
+export type BasinKey = "amu" | "syr" | "zeravshan" | "other";
 export type PresetView =
   | "none"
   | "water-scarcity"
@@ -72,6 +74,12 @@ interface Ctx {
   setQuery: (q: SpatialQuery) => void;
   highlightLayer: string | null;
   setHighlightLayer: (s: string | null) => void;
+  viewMode: MapViewMode;
+  setViewMode: (v: MapViewMode) => void;
+  selectedBasin: BasinKey | null;
+  setSelectedBasin: (b: BasinKey | null) => void;
+  legendVisible: boolean;
+  setLegendVisible: (v: boolean) => void;
 }
 
 const LayerContext = createContext<Ctx | null>(null);
@@ -102,6 +110,23 @@ export function LayerProvider({ children }: { children: ReactNode }) {
   const [preset, setPreset] = useState<PresetView>(initial?.preset ?? "none");
   const [query, setQueryState] = useState<SpatialQuery>(initial?.query ?? defaultQuery);
   const [highlightLayer, setHighlightLayer] = useState<string | null>(null);
+  const [viewMode, setViewModeState] = useState<MapViewMode>(() => {
+    if (typeof window === "undefined") return "districts";
+    return (localStorage.getItem("aqua.viewMode") as MapViewMode) || "districts";
+  });
+  const setViewMode = (v: MapViewMode) => {
+    setViewModeState(v);
+    if (typeof window !== "undefined") localStorage.setItem("aqua.viewMode", v);
+  };
+  const [selectedBasin, setSelectedBasin] = useState<BasinKey | null>(null);
+  const [legendVisible, setLegendVisibleState] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("aqua.legendVisible") !== "0";
+  });
+  const setLegendVisible = (v: boolean) => {
+    setLegendVisibleState(v);
+    if (typeof window !== "undefined") localStorage.setItem("aqua.legendVisible", v ? "1" : "0");
+  };
 
   const applyPreset = (p: PresetView) => {
     setPreset(p);
@@ -132,6 +157,12 @@ export function LayerProvider({ children }: { children: ReactNode }) {
         setQuery: setQueryState,
         highlightLayer,
         setHighlightLayer,
+        viewMode,
+        setViewMode,
+        selectedBasin,
+        setSelectedBasin,
+        legendVisible,
+        setLegendVisible,
       }}
     >
       {children}

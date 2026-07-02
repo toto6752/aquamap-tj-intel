@@ -3,6 +3,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLayers, LayerKey } from "../layout/LayerContext";
 import { useI18n } from "@/lib/i18n";
+import { basins } from "@/lib/basins";
 import {
   regions, rivers, glaciers, hydropower, riskZones, reservoirs,
   populationCenters, agriculturalZones, protectedAreas,
@@ -27,7 +28,8 @@ export function MapView() {
   const tileRef = useRef<L.TileLayer[]>([]);
   const layerGroupsRef = useRef<Record<string, L.LayerGroup>>({});
   const queryGroupRef = useRef<L.LayerGroup | null>(null);
-  const { layers, basemap, opacity, query, highlightLayer } = useLayers();
+  const basinsGroupRef = useRef<L.LayerGroup | null>(null);
+  const { layers, basemap, opacity, query, highlightLayer, viewMode, setSelectedBasin } = useLayers();
   const { t, lang } = useI18n();
 
   const addTiles = (map: L.Map, key: string) => {
@@ -70,6 +72,7 @@ export function MapView() {
     };
     layerGroupsRef.current = groups;
     queryGroupRef.current = L.layerGroup().addTo(map);
+    basinsGroupRef.current = L.layerGroup();
 
     regions.forEach((r) => {
       const poly = L.polygon(r.polygon, {
@@ -167,6 +170,40 @@ export function MapView() {
     return () => { map.remove(); mapRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
+
+  // Sync view mode (districts vs basins)
+  useEffect(() => {
+    const map = mapRef.current;
+    const groups = layerGroupsRef.current;
+    const bg = basinsGroupRef.current;
+    if (!map || !bg) return;
+    bg.clearLayers();
+    if (viewMode === "basins") {
+      if (groups.regions && map.hasLayer(groups.regions)) map.removeLayer(groups.regions);
+      basins.forEach((b) => {
+        const poly = L.polygon(b.polygon, {
+          color: b.color, weight: 2, fillColor: b.color, fillOpacity: 0.25,
+        })
+          .on("click", () => setSelectedBasin(b.key))
+          .on("mouseover", (e) => e.target.setStyle({ fillOpacity: 0.4 }))
+          .on("mouseout", (e) => e.target.setStyle({ fillOpacity: 0.25 }));
+        bg.addLayer(poly);
+        const label = L.marker(b.labelAt, {
+          interactive: false,
+          icon: L.divIcon({
+            className: "",
+            html: `<div style="background:rgba(255,255,255,0.9);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;color:${b.color};border:1px solid ${b.color};box-shadow:0 2px 6px rgba(0,0,0,0.1);white-space:nowrap">${t("basin." + b.key)}</div>`,
+            iconSize: [1, 1], iconAnchor: [0, 0],
+          }),
+        });
+        bg.addLayer(label);
+      });
+      if (!map.hasLayer(bg)) bg.addTo(map);
+    } else {
+      if (map.hasLayer(bg)) map.removeLayer(bg);
+      if (groups.regions && !map.hasLayer(groups.regions)) groups.regions.addTo(map);
+    }
+  }, [viewMode, lang, setSelectedBasin, t]);
 
   // Sync basemap
   useEffect(() => {

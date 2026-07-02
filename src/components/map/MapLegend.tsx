@@ -1,10 +1,11 @@
-import { Snowflake, Lightning, Waves, Drop } from "@phosphor-icons/react";
+import { Snowflake, Lightning, Waves, Drop, X } from "@phosphor-icons/react";
 import { useI18n } from "@/lib/i18n";
 import { useLayers } from "../layout/LayerContext";
 
 export function MapLegend() {
   const { t } = useI18n();
-  const { layers, setHighlightLayer } = useLayers();
+  const { layers, setHighlightLayer, legendVisible, setLegendVisible } = useLayers();
+  if (!legendVisible) return null;
   const items = [
     { color: "#54b97a", label: t("legend.high") },
     { color: "#f3a847", label: t("legend.mod") },
@@ -17,7 +18,15 @@ export function MapLegend() {
     { key: "reservoirs", label: t("legend.reservoirs"), Icon: Drop, color: "text-primary" },
   ].filter((d) => (layers as Record<string, boolean>)[d.key]);
   return (
-    <div className="panel p-3.5 w-[240px] backdrop-blur-md bg-card/95">
+    <div className="panel p-3.5 w-[240px] backdrop-blur-md bg-card/95 relative group animate-in fade-in duration-200">
+      <button
+        onClick={() => setLegendVisible(false)}
+        title={t("legend.hide")}
+        aria-label={t("legend.hide")}
+        className="absolute top-1.5 right-1.5 p-1 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground opacity-0 group-hover:opacity-100 md:opacity-0 max-md:opacity-40 transition"
+      >
+        <X size={12} />
+      </button>
       <div className="text-[10px] font-bold tracking-wider text-muted-foreground mb-2.5">
         {t("legend.title")}
       </div>
