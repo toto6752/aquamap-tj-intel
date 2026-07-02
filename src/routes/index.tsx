@@ -24,8 +24,16 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-function Index() {
+// Reads viewMode from context. Must be rendered INSIDE <AppShell>, since
+// LayerProvider lives inside AppShell — calling useLayers() any higher up
+// the tree (e.g. directly in Index(), above <AppShell>) throws
+// "useLayers must be used within LayerProvider" during SSR and crashes the page.
+function ActiveLegend() {
   const { viewMode } = useLayers();
+  return viewMode === "basins" ? <BasinLegend /> : <MapLegend />;
+}
+
+function Index() {
   return (
     <AppShell>
       <div className="flex-1 flex flex-col gap-3 min-h-0">
@@ -40,7 +48,7 @@ function Index() {
           </div>
           <BasinPanel />
           <div className="absolute bottom-3 left-3 z-[400]">
-            {viewMode === "basins" ? <BasinLegend /> : <MapLegend />}
+            <ActiveLegend />
           </div>
         </div>
         <StatsCards />
