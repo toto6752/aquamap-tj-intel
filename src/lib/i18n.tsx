@@ -244,6 +244,37 @@ const en: Dict = {
   "err.home": "Go home",
   "err.404title": "Page not found",
   "err.404body": "The page you're looking for doesn't exist or has been moved.",
+
+  // View toggle & legend controls (GIZ)
+  "view.districts": "Districts",
+  "view.basins": "River Basins",
+  "legend.hide": "Hide this panel",
+  "legend.show": "Show Access & Risk Level",
+
+  // Basins
+  "basin.legendTitle": "RIVER BASINS",
+  "basin.panelTitle": "RIVER BASIN",
+  "basin.annualVolume": "Annual volume",
+  "basin.share": "Share of total",
+  "basin.tributaries": "KEY TRIBUTARIES",
+  "basin.downstream": "DOWNSTREAM COUNTRIES",
+  "basin.challenges": "KEY CHALLENGES",
+  "basin.amu": "Amu Darya Basin",
+  "basin.syr": "Syr Darya Basin",
+  "basin.zeravshan": "Zeravshan Basin",
+  "basin.other": "Other Basins",
+  "basin.amu.tributaries": "Panj River, Vakhsh River, Kofarnihon River",
+  "basin.syr.tributaries": "Isfara, Khodjabakirgan, tributaries in Sughd",
+  "basin.zeravshan.tributaries": "Zeravshan River, Fandarya, Kishtut",
+  "basin.other.tributaries": "Various smaller tributaries in the Pamirs",
+  "basin.amu.downstream": "Uzbekistan, Turkmenistan, Afghanistan (40M+ people)",
+  "basin.syr.downstream": "Kyrgyzstan, Uzbekistan, Kazakhstan",
+  "basin.zeravshan.downstream": "Uzbekistan (portion flows downstream)",
+  "basin.other.downstream": "Endorheic / local drainage",
+  "basin.amu.challenges": "Winter water deficit; provides 55% of Aral Sea Basin water; critical for regional security.",
+  "basin.syr.challenges": "Transboundary management with Kyrgyzstan and Uzbekistan; seasonal flow variability.",
+  "basin.zeravshan.challenges": "Dry-season deficit; portion flows to Uzbekistan requiring coordination.",
+  "basin.other.challenges": "Limited land resources, deep valleys limiting access, high glacier-melt dependence (GBAO).",
 };
 
 const ru: Dict = {
