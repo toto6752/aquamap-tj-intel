@@ -5,6 +5,11 @@ import { MapLegend } from "@/components/map/MapLegend";
 import { BasemapSwitcher } from "@/components/map/BasemapSwitcher";
 import { MapTools } from "@/components/map/MapTools";
 import { WaterTypesLegend } from "@/components/map/WaterTypesLegend";
+import { BasinSwitcher } from "@/components/map/BasinSwitcher";
+import { BasinLegend } from "@/components/map/BasinLegend";
+import { BasinPanel } from "@/components/map/BasinPanel";
+import { RestoreLegendButton } from "@/components/map/RestoreLegendButton";
+import { useLayers } from "@/components/layout/LayerContext";
 import { StatsCards } from "@/components/stats/StatsCards";
 
 export const Route = createFileRoute("/")({
@@ -20,6 +25,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { viewMode } = useLayers();
   return (
     <AppShell>
       <div className="flex-1 flex flex-col gap-3 min-h-0">
@@ -27,11 +33,14 @@ function Index() {
           <MapClient />
           <div className="absolute top-3 left-3 z-[400] flex flex-col gap-2">
             <BasemapSwitcher />
+            <BasinSwitcher />
             <div className="relative"><MapTools /></div>
             <WaterTypesLegend />
+            <RestoreLegendButton />
           </div>
+          <BasinPanel />
           <div className="absolute bottom-3 left-3 z-[400]">
-            <MapLegend />
+            {viewMode === "basins" ? <BasinLegend /> : <MapLegend />}
           </div>
         </div>
         <StatsCards />
